@@ -1,7 +1,7 @@
 'use client';
 
 import { Reveal } from '@/components/ui/Chrome';
-import { rwaBenefits, opsSociety, opsFeed, residentDemo } from '@/config/society';
+import { rwaBenefits, monthlyReport, reportFeed, residentDemo } from '@/config/society';
 
 export function Rwa() {
   return (
@@ -64,7 +64,7 @@ export function Dashboards() {
         </Reveal>
         <Reveal delay={0.08}>
           <h2 className="display-sm mt-6 max-w-[20ch]">
-            Residents see their car. We see the whole cluster.
+            Residents see their car. The RWA gets the full report.
           </h2>
         </Reveal>
 
@@ -113,31 +113,30 @@ export function Dashboards() {
             </div>
           </Reveal>
 
-          {/* Operations */}
+          {/* RWA report */}
           <Reveal delay={0.12}>
             <div className="card overflow-hidden">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-3.5">
                 <span className="font-mono text-[0.66rem] uppercase tracking-widest2 text-chalk">
-                  {opsSociety.name}
+                  {monthlyReport.society}
                 </span>
                 <span className="font-mono text-[0.6rem] uppercase tracking-widest2 text-muted">
-                  {opsSociety.societies} societies · one route
+                  Monthly report · {monthlyReport.period}
                 </span>
               </div>
 
               <div className="grid gap-px bg-line sm:grid-cols-3 lg:grid-cols-4">
-                <Metric label="Cars" value={String(opsSociety.cars)} />
-                <Metric label="Active subscriptions" value={String(opsSociety.activeSubscriptions)} />
-                <Metric label="Workers on shift" value={String(opsSociety.workers)} />
-                <Metric label="Washes today" value={String(opsSociety.washesToday)} />
-                <Metric label="Worker utilisation" value={`${opsSociety.routeUtilisation}%`} accent />
-                <Metric label="Open complaints" value={String(opsSociety.openComplaints)} />
-                <Metric label="Satisfaction" value={`${opsSociety.satisfaction}%`} />
-                <Metric label="Water today" value={`${opsSociety.waterTodayLitres.toLocaleString('en-IN')} L`} />
+                <Metric label="Contracted washes" value={String(monthlyReport.contractedWashes)} />
+                <Metric label="Delivered washes" value={String(monthlyReport.deliveredWashes)} accent />
+                <Metric label="Complaints raised" value={String(monthlyReport.complaintsRaised)} />
+                <Metric label="Avg. resolution" value={`${monthlyReport.avgResolutionHours}h`} />
+                <Metric label="Open complaints" value={String(monthlyReport.openComplaints)} />
+                <Metric label="Worker attendance" value={`${monthlyReport.workerAttendance}%`} />
+                <Metric label="Water logged" value={`${monthlyReport.waterLoggedLitres.toLocaleString('en-IN')} L`} />
               </div>
 
               <ul className="divide-y divide-line border-t border-line">
-                {opsFeed.map((f) => (
+                {reportFeed.map((f) => (
                   <li key={f.time} className="flex gap-5 px-5 py-3">
                     <span className="font-mono text-[0.66rem] text-accent">{f.time}</span>
                     <span className="text-xs text-muted">{f.text}</span>
@@ -150,9 +149,9 @@ export function Dashboards() {
 
         <Reveal delay={0.2}>
           <p className="mt-10 max-w-[62ch] text-xs leading-relaxed text-muted">
-            Worker utilisation sits at the top of this dashboard on purpose. It is the metric the
-            business lives or dies on — a single society cannot fill a worker&apos;s day, which is
-            why we contract nearby societies as one route from the start.
+            Contracted vs delivered washes sits at the top of this report on purpose. It is the
+            number the committee actually holds us to — every wash we agree to deliver, accounted
+            for, in writing, every month.
           </p>
         </Reveal>
       </div>

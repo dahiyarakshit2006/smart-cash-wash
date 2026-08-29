@@ -39,10 +39,9 @@ export const methods: WashMethod[] = [
   },
 ];
 
-/** Defaults for the interactive calculator. All user-adjustable on the page. */
+/** Defaults for the interactive calculator — one resident's car, one month. */
 export const calculatorDefaults = {
-  cars: 300,
-  washesPerCarPerMonth: 22,
+  washesPerMonth: 22,
   /** Share of washes handled by each method under our SOP. Must sum to 1. */
   mix: { waterless: 0.6, lowwater: 0.33, traditional: 0.07 },
 };

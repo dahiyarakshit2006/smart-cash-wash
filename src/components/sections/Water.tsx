@@ -47,8 +47,7 @@ function Slider({
 }
 
 export default function Water() {
-  const [cars, setCars] = useState(calculatorDefaults.cars);
-  const [washes, setWashes] = useState(calculatorDefaults.washesPerCarPerMonth);
+  const [washes, setWashes] = useState(calculatorDefaults.washesPerMonth);
   const [waterlessShare, setWaterlessShare] = useState(
     Math.round(calculatorDefaults.mix.waterless * 100),
   );
@@ -57,26 +56,23 @@ export default function Water() {
     const traditionalShare = calculatorDefaults.mix.traditional;
     const wl = waterlessShare / 100;
     const lw = Math.max(0, 1 - wl - traditionalShare);
-    const totalWashes = cars * washes;
 
     const perWash =
       wl * mid(methods[2].litres) + lw * mid(methods[1].litres) + traditionalShare * mid(methods[0].litres);
-    const ours = totalWashes * perWash;
-    const baseline = totalWashes * mid(methods[0].litres);
+    const ours = washes * perWash;
+    const baseline = washes * mid(methods[0].litres);
 
     return {
-      totalWashes,
       ours,
       baseline,
       saved: baseline - ours,
       reduction: baseline > 0 ? (1 - ours / baseline) * 100 : 0,
       lowWaterShare: Math.round(lw * 100),
-      tankers: (baseline - ours) / 10000,
     };
-  }, [cars, washes, waterlessShare]);
+  }, [washes, waterlessShare]);
 
   return (
-    <section id="water" className="stage scrim relative">
+    <section id="water" className="stage stage-grow scrim relative">
       <div className="shell grid w-full items-center gap-14 py-28 lg:grid-cols-2">
         <div>
           <Reveal>
@@ -122,11 +118,10 @@ export default function Water() {
 
         <Reveal delay={0.2}>
           <div className="card p-7 sm:p-9">
-            <p className="eyebrow">Model your cluster</p>
+            <p className="eyebrow">Model your car</p>
 
             <div className="mt-7 space-y-7">
-              <Slider label="Cars served" value={cars} min={50} max={1000} step={10} suffix="cars" onChange={setCars} />
-              <Slider label="Washes per car" value={washes} min={4} max={30} suffix="/ month" onChange={setWashes} />
+              <Slider label="Washes per month" value={washes} min={4} max={30} suffix="/ month" onChange={setWashes} />
               <Slider
                 label="Handled waterless"
                 value={waterlessShare}
@@ -170,8 +165,7 @@ export default function Water() {
                 </span>
               </p>
               <p className="mt-2 text-xs text-muted">
-                per month · roughly {model.tankers.toFixed(1)} tanker loads · across{' '}
-                {fmt(model.totalWashes)} washes
+                per month · for your car · across {washes} washes
               </p>
             </div>
 

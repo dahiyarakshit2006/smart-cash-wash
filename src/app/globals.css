@@ -30,6 +30,8 @@ body {
 
 @layer components {
   .shell {
+    position: relative;
+    z-index: 1;
     width: 100%;
     max-width: theme('maxWidth.shell');
     margin-inline: auto;
@@ -94,11 +96,24 @@ body {
   align-items: center;
 }
 
+/* For stages whose content can exceed one viewport: keep the min-height
+   floor but top-align and pad instead of vertically centering, so extra
+   content pushes the section taller rather than centering off-screen. */
+.stage-grow {
+  align-items: flex-start;
+  padding-block: 5rem;
+}
+
 /* A soft scrim so text never fights the reflective floor behind it. */
+.scrim {
+  isolation: isolate;
+}
+
 .scrim::before {
   content: '';
   position: absolute;
   inset: 0;
+  z-index: 0;
   pointer-events: none;
   background: radial-gradient(120% 70% at 20% 50%, rgba(5, 7, 10, 0.92), rgba(5, 7, 10, 0) 68%);
 }

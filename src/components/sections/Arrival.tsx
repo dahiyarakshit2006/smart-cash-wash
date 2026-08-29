@@ -10,45 +10,38 @@ const capabilities = [
   ['Standardised SOP', 'One written method every worker is trained on'],
 ];
 
-/** The ratio is the whole business model, so it gets its own visual moment. */
-function RatioLadder() {
-  const rungs = [
-    { value: '300', unit: 'cars', note: 'across a hyperlocal cluster of nearby societies' },
-    { value: '6', unit: 'trained professionals', note: 'at a validated worker-to-car ratio' },
-    { value: '1', unit: 'supervised system', note: 'one contract, one accountable operator' },
+/** What the RWA actually receives when it signs — concrete, not modelled. */
+function Deliverables() {
+  const items = [
+    { label: 'Named supervisor', detail: 'One person, on the ground every morning, accountable to your RWA' },
+    { label: 'Fixed roster', detail: 'The same workers, on file with the RWA, not a rotating crew' },
+    { label: 'Same-morning cover', detail: 'Absence replaced before the first car arrives, not next week' },
+    { label: 'Written SOP', detail: 'One documented method, handed to your committee, every worker trained on it' },
+    { label: 'Verified workforce', detail: 'Police-verified, uniformed, badge-checked at the gate' },
   ];
   return (
     <div className="card p-8 sm:p-10">
-      {rungs.map((r, i) => (
-        <div key={r.unit}>
-          <Reveal delay={i * 0.12}>
-            <div className="flex items-baseline gap-5">
-              <span className="font-display text-5xl font-extrabold tracking-tightest text-chalk sm:text-6xl">
-                {r.value}
-              </span>
+      {items.map((it, i) => (
+        <div key={it.label}>
+          <Reveal delay={i * 0.1}>
+            <div className="flex items-start gap-4">
+              <span
+                className="mt-1 h-2 w-2 shrink-0 rounded-full bg-accent"
+                aria-hidden="true"
+              />
               <div>
-                <p className="font-mono text-[0.7rem] uppercase tracking-widest2 text-accent">
-                  {r.unit}
+                <p className="font-mono text-[0.7rem] uppercase tracking-widest2 text-chalk">
+                  {it.label}
                 </p>
-                <p className="mt-1 text-sm text-muted">{r.note}</p>
+                <p className="mt-1 text-sm text-muted">{it.detail}</p>
               </div>
             </div>
           </Reveal>
-          {i < rungs.length - 1 && (
-            <div className="my-6 flex items-center gap-3" aria-hidden="true">
-              <span className="h-10 w-px bg-gradient-to-b from-accent/50 to-transparent" />
-              <span className="font-mono text-[0.6rem] tracking-widest2 text-muted">
-                {i === 0 ? 'deployed as' : 'operated as'}
-              </span>
-            </div>
+          {i < items.length - 1 && (
+            <div className="my-5 border-t border-line/60" aria-hidden="true" />
           )}
         </div>
       ))}
-      <p className="mt-8 border-t border-line pt-5 text-xs leading-relaxed text-muted">
-        The ratio shown is our working model. It is being validated in pilot and will be
-        tuned per society by layout, service frequency and worker productivity — not
-        assumed.
-      </p>
     </div>
   );
 }
@@ -89,7 +82,7 @@ export default function Arrival() {
           </Reveal>
         </div>
 
-        <RatioLadder />
+        <Deliverables />
       </div>
     </section>
   );

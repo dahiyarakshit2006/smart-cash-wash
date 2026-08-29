@@ -1,23 +1,22 @@
-/** Demo data for the operations dashboard visualisation. */
-export const opsSociety = {
-  name: 'Cluster 04 · Sector 137, Noida',
-  societies: 3,
-  cars: 500,
-  activeSubscriptions: 421,
-  workers: 10,
-  washesToday: 386,
+/** Demo data for the monthly RWA report card — the artefact a committee receives, not a live ops view. */
+export const monthlyReport = {
+  society: 'Sector 137, Noida',
+  period: 'August 2026',
+  contractedWashes: 6600,
+  deliveredWashes: 6482,
   openComplaints: 2,
-  satisfaction: 96,
-  waterTodayLitres: 3120,
-  routeUtilisation: 87,
+  complaintsRaised: 9,
+  avgResolutionHours: 4.5,
+  waterLoggedLitres: 94300,
+  workerAttendance: 97,
 };
 
-export const opsFeed = [
-  { time: '06:12', text: 'Route A started · 4 workers on shift' },
-  { time: '07:48', text: 'Backup worker assigned to Tower C (absence)' },
-  { time: '08:42', text: 'B-1204 washed · quality approved' },
-  { time: '09:30', text: 'Complaint #218 resolved · re-wash completed' },
-  { time: '11:05', text: 'Water log submitted · 3,120 L across 386 washes' },
+export const reportFeed = [
+  { time: '03 Aug', text: 'Backup worker deployed same morning · 1 absence covered' },
+  { time: '11 Aug', text: 'Complaint #218 logged · re-wash completed, resolved in 3h' },
+  { time: '18 Aug', text: 'Monthly SOP audit completed · no deviations found' },
+  { time: '24 Aug', text: 'Water log reconciled with RWA · 94,300 L across the month' },
+  { time: '29 Aug', text: 'Attendance review · 97% shift coverage this month' },
 ];
 
 /** Resident-facing demo card. Generic vehicle — no third-party marks. */
