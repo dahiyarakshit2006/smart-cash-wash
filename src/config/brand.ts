@@ -20,5 +20,4 @@ export const nav = [
   { label: 'The system', href: '#arrival' },
   { label: 'Plans', href: '#subscription' },
   { label: 'Water', href: '#water' },
-  { label: 'For RWAs', href: '#rwa' },
 ] as const;

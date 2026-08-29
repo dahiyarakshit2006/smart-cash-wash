@@ -7,7 +7,6 @@ import Subscription from '@/components/sections/Subscription';
 import Water from '@/components/sections/Water';
 import { Wash, Quality, Drying, Ready } from '@/components/sections/Process';
 import Platform from '@/components/sections/Platform';
-import { Rwa, Dashboards } from '@/components/sections/Dashboards';
 import Cta from '@/components/sections/Cta';
 
 export default function Page() {
@@ -36,8 +35,6 @@ export default function Page() {
 
       {/* Past the journey the canvas fades out and the page becomes solid. */}
       <Platform />
-      <Rwa />
-      <Dashboards />
       <Cta />
     </>
   );
