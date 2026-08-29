@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --shell: clamp(1.25rem, 5vw, 4.5rem);
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-ink text-chalk font-sans antialiased;
+  overflow-x: hidden;
+}
+
+/* Keyboard focus stays visible everywhere. */
+:focus-visible {
+  outline: 2px solid #00e58f;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+@layer components {
+  .shell {
+    width: 100%;
+    max-width: theme('maxWidth.shell');
+    margin-inline: auto;
+    padding-inline: var(--shell);
+  }
+
+  /* Display type: tight, heavy, negative tracking. The automotive register. */
+  .display {
+    @apply font-display font-extrabold tracking-tightest leading-[0.95];
+    font-size: clamp(2.5rem, 6.4vw, 5.5rem);
+  }
+
+  .display-sm {
+    @apply font-display font-extrabold tracking-tightest leading-[1];
+    font-size: clamp(1.9rem, 3.6vw, 3.1rem);
+  }
+
+  /* The mono eyebrow is the "operating system" tell — used for stage numbers,
+     metrics and labels, never for prose. */
+  .eyebrow {
+    @apply font-mono text-[0.68rem] uppercase tracking-widest2 text-muted;
+  }
+
+  .lede {
+    @apply text-muted leading-relaxed;
+    font-size: clamp(1rem, 1.15vw, 1.15rem);
+    max-width: 46ch;
+  }
+
+  .rule {
+    @apply h-px w-full bg-line;
+  }
+
+  .card {
+    @apply rounded-xl border border-line bg-surface/70 backdrop-blur-md;
+  }
+
+  .btn {
+    @apply inline-flex items-center gap-2 rounded-full px-6 py-3 font-mono text-[0.72rem] uppercase tracking-widest2 transition-all duration-300;
+  }
+
+  .btn-primary {
+    @apply btn bg-accent text-ink hover:bg-white;
+  }
+
+  .btn-ghost {
+    @apply btn border border-line text-chalk hover:border-accent hover:text-accent;
+  }
+
+  .field {
+    @apply w-full rounded-lg border border-line bg-ink/60 px-4 py-3 text-sm text-chalk
+           placeholder:text-muted/60 transition-colors focus:border-accent focus:outline-none;
+  }
+}
+
+/* Stage sections sit above the canvas and stay legible over it. */
+.stage {
+  position: relative;
+  z-index: 10;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+}
+
+/* A soft scrim so text never fights the reflective floor behind it. */
+.scrim::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(120% 70% at 20% 50%, rgba(5, 7, 10, 0.92), rgba(5, 7, 10, 0) 68%);
+}
+
+@media (max-width: 900px) {
+  .scrim::before {
+    background: linear-gradient(180deg, rgba(5, 7, 10, 0.9) 0%, rgba(5, 7, 10, 0.55) 45%, rgba(5, 7, 10, 0.94) 100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
