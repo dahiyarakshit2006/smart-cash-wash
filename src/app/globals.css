@@ -87,9 +87,12 @@ body {
   }
 }
 
-/* Stage sections sit above the canvas and stay legible over it. */
+/* Stage sections host a background video and stay legible over it. Each one
+   establishes its own stacking context (isolation) so the SectionVideo's
+   scrim can never paint above the content — see SectionVideo.tsx. */
 .stage {
   position: relative;
+  isolation: isolate;
   z-index: 10;
   min-height: 100svh;
   display: flex;
@@ -102,26 +105,6 @@ body {
 .stage-grow {
   align-items: flex-start;
   padding-block: 5rem;
-}
-
-/* A soft scrim so text never fights the reflective floor behind it. */
-.scrim {
-  isolation: isolate;
-}
-
-.scrim::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background: radial-gradient(120% 70% at 20% 50%, rgba(5, 7, 10, 0.92), rgba(5, 7, 10, 0) 68%);
-}
-
-@media (max-width: 900px) {
-  .scrim::before {
-    background: linear-gradient(180deg, rgba(5, 7, 10, 0.9) 0%, rgba(5, 7, 10, 0.55) 45%, rgba(5, 7, 10, 0.94) 100%);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

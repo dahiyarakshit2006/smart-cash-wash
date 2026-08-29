@@ -2,23 +2,19 @@
 
 import { useState } from 'react';
 import { Reveal, StageHeading } from '@/components/ui/Chrome';
+import SectionVideo from '@/components/ui/SectionVideo';
 import { plans, addOns, currency } from '@/config/pricing';
-import { journey } from '@/lib/journey';
+import { sectionVideo } from '@/config/media';
 
 export default function Subscription() {
   const [active, setActive] = useState(-1);
 
-  const focus = (i: number) => {
-    setActive(i);
-    journey.hoveredPlan = i;
-  };
-  const blur = () => {
-    setActive(-1);
-    journey.hoveredPlan = -1;
-  };
+  const focus = (i: number) => setActive(i);
+  const blur = () => setActive(-1);
 
   return (
-    <section id="subscription" className="stage scrim relative">
+    <section id="subscription" className="stage relative">
+      <SectionVideo src={sectionVideo.subscription} />
       <div className="shell w-full py-28">
         <div className="grid gap-14 lg:grid-cols-[minmax(0,24rem)_1fr] lg:items-end">
           <div>
@@ -89,7 +85,7 @@ export default function Subscription() {
                         on ? 'text-accent' : 'text-muted'
                       }`}
                     >
-                      See it on the car →
+                      {on ? 'Selected' : 'Select this plan'} →
                     </span>
                   </button>
                 );

@@ -2,7 +2,9 @@
 
 import { useMemo, useState } from 'react';
 import { Reveal, StageHeading } from '@/components/ui/Chrome';
+import SectionVideo from '@/components/ui/SectionVideo';
 import { methods, calculatorDefaults, disclaimer } from '@/config/water';
+import { sectionVideo } from '@/config/media';
 
 const mid = ([a, b]: [number, number]) => (a + b) / 2;
 const fmt = (n: number) => Math.round(n).toLocaleString('en-IN');
@@ -72,7 +74,8 @@ export default function Water() {
   }, [washes, waterlessShare]);
 
   return (
-    <section id="water" className="stage stage-grow scrim relative">
+    <section id="water" className="stage stage-grow relative">
+      <SectionVideo src={sectionVideo.water} />
       <div className="shell grid w-full items-center gap-14 py-28 lg:grid-cols-2">
         <div>
           <Reveal>

@@ -1,4 +1,3 @@
-import CanvasMount from '@/components/vehicle/CanvasMount';
 import SmoothScroll from '@/components/ui/SmoothScroll';
 import { Nav } from '@/components/ui/Chrome';
 import { Hero, Transition } from '@/components/sections/Opening';
@@ -14,14 +13,8 @@ export default function Page() {
     <>
       <SmoothScroll />
       <Nav />
-      <CanvasMount />
 
-      {/*
-        Everything inside #journey is anchored to the 3D scene: the scroll
-        position within this element is the timeline the car moves along.
-        Nine sections, nine keyframes.
-      */}
-      <main id="journey" className="relative">
+      <main className="relative">
         <Hero />
         <Transition />
         <Arrival />
@@ -33,7 +26,6 @@ export default function Page() {
         <Ready />
       </main>
 
-      {/* Past the journey the canvas fades out and the page becomes solid. */}
       <Platform />
       <Cta />
     </>

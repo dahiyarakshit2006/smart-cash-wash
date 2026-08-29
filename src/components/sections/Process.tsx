@@ -3,6 +3,8 @@
 import { useRef } from 'react';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import { Reveal, StageHeading } from '@/components/ui/Chrome';
+import SectionVideo from '@/components/ui/SectionVideo';
+import { sectionVideo } from '@/config/media';
 
 const sop = [
   ['Pre-clean', 'Loose grit lifted before anything touches the paint. This is the step that prevents swirl marks, and the step individual washers skip.'],
@@ -27,7 +29,8 @@ function Wash() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start 0.85', 'end 0.35'] });
 
   return (
-    <section className="stage scrim relative">
+    <section className="stage relative">
+      <SectionVideo src={sectionVideo.wash} />
       <div className="shell w-full py-28" ref={ref}>
         <div className="grid gap-14 lg:grid-cols-[minmax(0,22rem)_1fr]">
           <div>
@@ -84,7 +87,8 @@ function Quality() {
   const inView = useInView(ref, { once: true, margin: '-20%' });
 
   return (
-    <section className="stage scrim relative">
+    <section className="stage relative">
+      <SectionVideo src={sectionVideo.quality} />
       <div className="shell grid w-full items-center gap-14 py-28 lg:grid-cols-2">
         <div>
           <Reveal>
@@ -148,6 +152,7 @@ function Drying() {
 
   return (
     <section className="stage relative">
+      <SectionVideo src={sectionVideo.drying} />
       <div className="shell w-full py-28 text-center" ref={ref}>
         <Reveal>
           <StageHeading index={6} label="Drying" />
@@ -168,7 +173,8 @@ function Drying() {
 
 function Ready() {
   return (
-    <section className="stage scrim relative">
+    <section className="stage relative">
+      <SectionVideo src={sectionVideo.ready} />
       <div className="shell w-full py-28">
         <Reveal>
           <StageHeading index={7} label="Ready" />

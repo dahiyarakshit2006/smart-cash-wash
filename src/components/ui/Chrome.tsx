@@ -3,7 +3,6 @@
 import { motion, useInView } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { brand, nav } from '@/config/brand';
-import { journey, activeStage } from '@/lib/journey';
 
 export function Wordmark({ className = '' }: { className?: string }) {
   return (
@@ -62,25 +61,15 @@ export function StageHeading({ index, label }: { index: number; label: string })
   );
 }
 
-/** Fixed chrome. The stage readout doubles as a progress indicator. */
+/** Fixed chrome. */
 export function Nav() {
-  const [stage, setStage] = useState('Residential parking');
   const [solid, setSolid] = useState(false);
 
   useEffect(() => {
-    let raf = 0;
-    let last = '';
-    const tick = () => {
-      const s = activeStage(journey.progress).label;
-      if (s !== last) {
-        last = s;
-        setStage(s);
-      }
-      setSolid(window.scrollY > 40);
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    const onScroll = () => setSolid(window.scrollY > 40);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   return (
@@ -91,13 +80,6 @@ export function Nav() {
     >
       <div className="shell flex h-16 items-center justify-between gap-6">
         <Wordmark />
-
-        <div className="hidden items-center gap-2 lg:flex" aria-hidden="true">
-          <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-          <span className="font-mono text-[0.62rem] uppercase tracking-widest2 text-muted">
-            {stage}
-          </span>
-        </div>
 
         <nav className="flex items-center gap-7">
           <ul className="hidden items-center gap-7 md:flex">
