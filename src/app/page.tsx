@@ -1,4 +1,5 @@
 import SmoothScroll from '@/components/ui/SmoothScroll';
+import VideoBackdrop from '@/components/ui/VideoBackdrop';
 import { Nav } from '@/components/ui/Chrome';
 import { Hero, Transition } from '@/components/sections/Opening';
 import Arrival from '@/components/sections/Arrival';
@@ -13,6 +14,7 @@ export default function Page() {
     <>
       <SmoothScroll />
       <Nav />
+      <VideoBackdrop />
 
       <main className="relative">
         <Hero />

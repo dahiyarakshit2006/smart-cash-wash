@@ -3,6 +3,8 @@
 import { motion, useInView } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { brand, nav } from '@/config/brand';
+import { journey } from '@/config/media';
+import { useActiveJourneySection } from '@/lib/useActiveJourneySection';
 
 export function Wordmark({ className = '' }: { className?: string }) {
   return (
@@ -61,9 +63,10 @@ export function StageHeading({ index, label }: { index: number; label: string })
   );
 }
 
-/** Fixed chrome. */
+/** Fixed chrome. The stage readout doubles as a progress indicator. */
 export function Nav() {
   const [solid, setSolid] = useState(false);
+  const activeIndex = useActiveJourneySection();
 
   useEffect(() => {
     const onScroll = () => setSolid(window.scrollY > 40);
@@ -80,6 +83,13 @@ export function Nav() {
     >
       <div className="shell flex h-16 items-center justify-between gap-6">
         <Wordmark />
+
+        <div className="hidden items-center gap-2 lg:flex" aria-hidden="true">
+          <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+          <span className="font-mono text-[0.62rem] uppercase tracking-widest2 text-muted">
+            {journey[activeIndex].label}
+          </span>
+        </div>
 
         <nav className="flex items-center gap-7">
           <ul className="hidden items-center gap-7 md:flex">

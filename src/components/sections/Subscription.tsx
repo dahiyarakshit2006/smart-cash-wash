@@ -2,9 +2,7 @@
 
 import { useState } from 'react';
 import { Reveal, StageHeading } from '@/components/ui/Chrome';
-import SectionVideo from '@/components/ui/SectionVideo';
 import { plans, addOns, currency } from '@/config/pricing';
-import { sectionVideo } from '@/config/media';
 
 export default function Subscription() {
   const [active, setActive] = useState(-1);
@@ -13,8 +11,7 @@ export default function Subscription() {
   const blur = () => setActive(-1);
 
   return (
-    <section id="subscription" className="stage relative">
-      <SectionVideo src={sectionVideo.subscription} />
+    <section id="subscription" data-journey="subscription" className="stage relative">
       <div className="shell w-full py-28">
         <div className="grid gap-14 lg:grid-cols-[minmax(0,24rem)_1fr] lg:items-end">
           <div>

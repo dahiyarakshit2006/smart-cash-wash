@@ -1,8 +1,6 @@
 'use client';
 
 import { Reveal, StageHeading } from '@/components/ui/Chrome';
-import SectionVideo from '@/components/ui/SectionVideo';
-import { sectionVideo } from '@/config/media';
 
 const capabilities = [
   ['Verified workers', 'Police-verified, uniformed, on a named roster'],
@@ -50,8 +48,7 @@ function Deliverables() {
 
 export default function Arrival() {
   return (
-    <section id="arrival" className="stage relative">
-      <SectionVideo src={sectionVideo.arrival} />
+    <section id="arrival" data-journey="arrival" className="stage relative">
       <div className="shell grid w-full items-center gap-14 py-28 lg:grid-cols-[1fr_minmax(0,26rem)]">
         <div>
           <Reveal>

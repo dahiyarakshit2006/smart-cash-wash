@@ -3,9 +3,7 @@
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Reveal } from '@/components/ui/Chrome';
-import SectionVideo from '@/components/ui/SectionVideo';
 import { futureServices } from '@/config/society';
-import { sectionVideo } from '@/config/media';
 
 /** One car becomes a society becomes a cluster. The zoom-out, in markup. */
 function Swarm() {
@@ -40,8 +38,7 @@ function Swarm() {
 
 export default function Platform() {
   return (
-    <section className="relative isolate z-10 border-t border-line bg-ink">
-      <SectionVideo src={sectionVideo.platform} />
+    <section data-journey="platform" className="relative z-10 border-t border-line">
       <div className="shell py-28 sm:py-36">
         <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
           <div>

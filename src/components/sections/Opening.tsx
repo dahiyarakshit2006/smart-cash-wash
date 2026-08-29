@@ -1,9 +1,7 @@
 'use client';
 
 import { Reveal } from '@/components/ui/Chrome';
-import SectionVideo from '@/components/ui/SectionVideo';
 import { brand } from '@/config/brand';
-import { sectionVideo } from '@/config/media';
 
 const failures = [
   { k: 'Unorganised labour', v: 'No employer, no roster, no cover when someone stops coming.' },
@@ -14,8 +12,7 @@ const failures = [
 
 export function Hero() {
   return (
-    <section id="top" className="stage relative">
-      <SectionVideo src={sectionVideo.hero} />
+    <section id="top" data-journey="hero" className="stage relative">
       <div className="shell relative w-full pb-24 pt-32">
         <Reveal>
           <p className="eyebrow mb-7 text-sodium">{brand.region}</p>
@@ -74,8 +71,7 @@ export function Hero() {
 
 export function Transition() {
   return (
-    <section className="stage relative">
-      <SectionVideo src={sectionVideo.transition} />
+    <section data-journey="transition" className="stage relative">
       <div className="shell w-full">
         <div className="max-w-3xl">
           <Reveal>

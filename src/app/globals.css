@@ -87,9 +87,11 @@ body {
   }
 }
 
-/* Stage sections host a background video and stay legible over it. Each one
-   establishes its own stacking context (isolation) so the SectionVideo's
-   scrim can never paint above the content — see SectionVideo.tsx. */
+/* Stage sections sit above the fixed VideoBackdrop (z-0) and stay legible
+   over it. Each one establishes its own stacking context (isolation) as a
+   defensive measure — this project previously had a bug where a scrim
+   pseudo-element painted over section copy; isolation here means a scrim
+   can never end up above these z-index:1 content wrappers again. */
 .stage {
   position: relative;
   isolation: isolate;
