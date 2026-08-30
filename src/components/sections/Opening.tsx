@@ -2,13 +2,9 @@
 
 import { Reveal } from '@/components/ui/Chrome';
 import { brand } from '@/config/brand';
+import { plans, currency } from '@/config/pricing';
 
-const failures = [
-  { k: 'Unorganised labour', v: 'No employer, no roster, no cover when someone stops coming.' },
-  { k: 'Inconsistent quality', v: 'Every washer has their own method. Nobody has written one down.' },
-  { k: 'Uncontrolled water', v: 'An open hose, no measurement, no one accountable for the total.' },
-  { k: 'No accountability', v: 'When it goes wrong, there is no company to call — only a person.' },
-];
+const startingPrice = Math.min(...plans.map((p) => p.price));
 
 export function Hero() {
   return (
@@ -20,42 +16,30 @@ export function Hero() {
 
         <Reveal delay={0.08}>
           <h1 className="display max-w-[19ch]">
-            Your car gets washed every day.
-            <br />
-            <span className="text-muted">The system behind it is broken.</span>
+            Professionally managed car washing for your society.
           </h1>
         </Reveal>
 
         <Reveal delay={0.16}>
-          <p className="lede mt-8">
-            Thousands of residential societies across Delhi-NCR run on car washing that no
-            company owns. The demand is already there. The infrastructure is not.
+          <p className="display-sm mt-8 max-w-[22ch] text-chalk">
+            One company. Verified workers. From {currency}
+            {startingPrice}/month.
           </p>
         </Reveal>
 
-        <Reveal delay={0.24}>
-          <div className="mt-10 flex flex-wrap items-center gap-4">
-            <a href="#arrival" className="btn-primary">
-              Experience the system
-              <span aria-hidden="true">→</span>
-            </a>
-            <a href="#onboard" className="btn-ghost">
-              Bring it to your society
-            </a>
-          </div>
+        <Reveal delay={0.22}>
+          <p className="lede mt-4 text-muted">
+            The alternative to whoever currently washes your car in the basement.
+          </p>
         </Reveal>
 
-        <Reveal delay={0.34}>
-          <dl className="mt-20 grid gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
-            {failures.map((f) => (
-              <div key={f.k} className="bg-ink/80 p-6 backdrop-blur-sm">
-                <dt className="font-mono text-[0.66rem] uppercase tracking-widest2 text-sodium">
-                  {f.k}
-                </dt>
-                <dd className="mt-3 text-sm leading-relaxed text-muted">{f.v}</dd>
-              </div>
-            ))}
-          </dl>
+        <Reveal delay={0.3}>
+          <div className="mt-10 flex flex-wrap items-center gap-4">
+            <a href="#subscription" className="btn-primary">
+              See plans
+              <span aria-hidden="true">→</span>
+            </a>
+          </div>
         </Reveal>
 
         <Reveal delay={0.46}>
@@ -71,11 +55,15 @@ export function Hero() {
 
 export function Transition() {
   return (
-    <section data-journey="transition" className="stage relative">
+    <section data-journey="transition" className="stage-auto">
       <div className="shell w-full">
         <div className="max-w-3xl">
           <Reveal>
-            <h2 className="display-sm">So we rebuilt the experience.</h2>
+            <h2 className="display-sm max-w-[19ch]">
+              Your car gets washed every day.
+              <br />
+              <span className="text-muted">The system behind it is broken.</span>
+            </h2>
           </Reveal>
           <Reveal delay={0.12}>
             <p className="display-sm mt-6 text-muted">

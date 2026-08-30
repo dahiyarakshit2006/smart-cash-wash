@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import { motion, useScroll, useTransform, useInView } from 'framer-motion';
+import { motion, useScroll, useInView } from 'framer-motion';
 import { Reveal, StageHeading } from '@/components/ui/Chrome';
 
 const sop = [
@@ -32,7 +32,7 @@ function Wash() {
         <div className="grid gap-14 lg:grid-cols-[minmax(0,22rem)_1fr]">
           <div>
             <Reveal>
-              <StageHeading index={4} label="The wash" />
+              <StageHeading index={3} label="The wash" />
             </Reveal>
             <Reveal delay={0.08}>
               <h2 className="display-sm max-w-[12ch]">One method. Every car.</h2>
@@ -88,7 +88,7 @@ function Quality() {
       <div className="shell grid w-full items-center gap-14 py-28 lg:grid-cols-2">
         <div>
           <Reveal>
-            <StageHeading index={5} label="Quality control" />
+            <StageHeading index={4} label="Quality control" />
           </Reveal>
           <Reveal delay={0.08}>
             <h2 className="display-sm max-w-[15ch]">
@@ -141,42 +141,25 @@ function Quality() {
   );
 }
 
-function Drying() {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
-  const x = useTransform(scrollYProgress, [0, 1], ['-8%', '8%']);
-
-  return (
-    <section data-journey="drying" className="stage relative">
-      <div className="shell w-full py-28 text-center" ref={ref}>
-        <Reveal>
-          <StageHeading index={6} label="Drying" />
-        </Reveal>
-        <motion.h2 style={{ x }} className="display mx-auto max-w-[10ch]">
-          Clean. Dry. Ready.
-        </motion.h2>
-        <Reveal delay={0.14}>
-          <p className="lede mx-auto mt-8 text-center">
-            Forced air through the shuts and panel gaps, then microfibre. Water is removed, not
-            left to spot in the sun.
-          </p>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
 function Ready() {
   return (
     <section data-journey="ready" className="stage relative">
       <div className="shell w-full py-28">
         <Reveal>
-          <StageHeading index={7} label="Ready" />
+          <StageHeading index={5} label="Ready" />
         </Reveal>
         <Reveal delay={0.08}>
-          <h2 className="display max-w-[14ch]">Ready before your day begins.</h2>
+          <h2 className="display max-w-[18ch]">
+            Clean, dried, checked — and back in your slot before you leave.
+          </h2>
         </Reveal>
-        <Reveal delay={0.18}>
+        <Reveal delay={0.14}>
+          <p className="lede mt-8">
+            Forced air through the shuts and panel gaps, then microfibre. Water is removed, not
+            left to spot in the sun.
+          </p>
+        </Reveal>
+        <Reveal delay={0.22}>
           <div className="mt-14 grid gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-4">
             {[
               ['Washed', 'To the same standard as every other car in the society'],
@@ -196,4 +179,4 @@ function Ready() {
   );
 }
 
-export { Wash, Quality, Drying, Ready };
+export { Wash, Quality, Ready };

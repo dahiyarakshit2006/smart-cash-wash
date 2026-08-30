@@ -109,6 +109,18 @@ body {
   padding-block: 5rem;
 }
 
+/* For stages that are just a heading and a line or two: size to content
+   with generous padding instead of forcing a full viewport of scroll. */
+.stage-auto {
+  position: relative;
+  isolation: isolate;
+  z-index: 10;
+  min-height: 0;
+  padding-block: 7rem;
+  display: flex;
+  align-items: center;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
