@@ -1,17 +1,16 @@
-// Service worker for /wash. Scope: Background Sync for the offline photo
-// queue. Reads/writes IndexedDB directly and uploads via fetch so retries
-// work even with no app window open — postMessage-to-client alone can't do
-// that, since a killed app has no client to message.
-//
-// Deliberately does NOT cache app shell/pages here — that's a separate
-// PWA-installability concern (see PWA manifest task), kept out of this file
-// so the offline-queue module stays testable in isolation.
+// Service worker for /wash. Two jobs:
+// 1. Background Sync for the offline photo queue (reads/writes IndexedDB
+//    directly and uploads via fetch so retries work with no app window open).
+// 2. A network-first app-shell cache so /wash pages still load when the
+//    device has no signal at all (not just a bad connection) — required for
+//    PWA installability and for the worker to be able to open the app cold.
 
 const DB_NAME = "wash-photo-queue";
 const DB_VERSION = 1;
 const STORE = "photos";
 const CONFIG_STORE = "config";
 const STORAGE_BUCKET = "wash-photos";
+const SHELL_CACHE = "wash-shell-v1";
 
 function openDb() {
   return new Promise((resolve, reject) => {
@@ -111,4 +110,25 @@ self.addEventListener("sync", (event) => {
   if (event.tag === "wash-photo-queue-sync") {
     event.waitUntil(flushQueue());
   }
+});
+
+self.addEventListener("fetch", (event) => {
+  const url = new URL(event.request.url);
+  if (event.request.method !== "GET" || !url.pathname.startsWith("/wash")) return;
+  // Never cache Supabase/API calls or the dev-only queue-test harness.
+  if (url.pathname.startsWith("/wash/dev-queue-test")) return;
+
+  event.respondWith(
+    (async () => {
+      try {
+        const response = await fetch(event.request);
+        const cache = await caches.open(SHELL_CACHE);
+        cache.put(event.request, response.clone());
+        return response;
+      } catch {
+        const cached = await caches.match(event.request);
+        return cached ?? Response.error();
+      }
+    })()
+  );
 });

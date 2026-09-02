@@ -1,17 +1,33 @@
-"use client";
+import type { Metadata, Viewport } from "next";
+import WashLayoutClient from "./WashLayoutClient";
 
-import { useEffect } from "react";
-import { LangProvider } from "@/lib/i18n";
-import { initPhotoQueue } from "@/lib/photo-queue/queue";
+// Scoped to /wash only (manifest "scope" is "/wash") — installing this PWA
+// does not affect or represent the rest of the marketing site.
+export const metadata: Metadata = {
+  title: "Dhruva Wash",
+  manifest: "/wash-manifest.json",
+  icons: {
+    icon: [
+      { url: "/wash-icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/wash-icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: "/wash-icon-192.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Wash",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0b0b0c",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
 
 export default function WashLayout({ children }: { children: React.ReactNode }) {
-  useEffect(() => {
-    initPhotoQueue();
-  }, []);
-
-  return (
-    <LangProvider>
-      <div style={{ minHeight: "100vh", background: "#0b0b0c", color: "#f5f5f5" }}>{children}</div>
-    </LangProvider>
-  );
+  return <WashLayoutClient>{children}</WashLayoutClient>;
 }
