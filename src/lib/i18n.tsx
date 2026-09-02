@@ -159,19 +159,20 @@ export function useT() {
 
 export function LangToggle() {
   const { lang, setLang } = useLang();
+  const base = "font-mono text-xs uppercase tracking-widest2 px-2 py-1 rounded-md transition-colors duration-150";
   return (
-    <div style={{ display: "flex", gap: 8 }}>
+    <div className="flex items-center gap-1 rounded-lg border border-line p-1">
       <button
         onClick={() => setLang("hi")}
         aria-pressed={lang === "hi"}
-        style={{ fontWeight: lang === "hi" ? 700 : 400 }}
+        className={`${base} ${lang === "hi" ? "bg-accent text-ink" : "text-muted"}`}
       >
         हिं
       </button>
       <button
         onClick={() => setLang("en")}
         aria-pressed={lang === "en"}
-        style={{ fontWeight: lang === "en" ? 700 : 400 }}
+        className={`${base} ${lang === "en" ? "bg-accent text-ink" : "text-muted"}`}
       >
         EN
       </button>

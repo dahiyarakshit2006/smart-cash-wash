@@ -42,28 +42,28 @@ export default function ProfilePage() {
   const workerCode = `CW-${session.workerId.slice(0, 4).toUpperCase()}`;
 
   return (
-    <div style={{ padding: 16, maxWidth: 480, margin: "0 auto", paddingBottom: 90 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 20 }}>
-        <h1 style={{ fontSize: 20 }}>{t("profile_title")}</h1>
+    <div className="mx-auto max-w-md px-4 pb-24 pt-6">
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="wash-heading">{t("profile_title")}</h1>
         <LangToggle />
       </div>
 
-      <div style={{ textAlign: "center", marginBottom: 24 }}>
-        <div style={{ fontSize: 22, fontWeight: 700 }}>{session.name}</div>
+      <div className="mb-6 text-center">
+        <div className="wash-greeting">{session.name}</div>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 24 }}>
+      <div className="mb-6 flex flex-col gap-2">
         <Row label={t("profile_worker_id")} value={workerCode} />
         <Row label={t("profile_cluster")} value={clusterName} />
       </div>
 
-      <h2 style={{ fontSize: 14, opacity: 0.7, marginBottom: 10 }}>{t("profile_this_month")}</h2>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 32 }}>
+      <h2 className="wash-eyebrow mb-3">{t("profile_this_month")}</h2>
+      <div className="mb-8 grid grid-cols-2 gap-2.5">
         <StatCard label={t("profile_cars_completed")} value={stats.carsCompletedThisMonth} />
         <StatCard label={t("profile_working_days")} value={stats.workingDaysThisMonth} />
       </div>
 
-      <button onClick={onLogout} style={logoutButtonStyle}>
+      <button onClick={onLogout} className="w-full rounded-xl border border-line px-4 py-3.5 text-sm text-sodium">
         {t("profile_logout")}
       </button>
 
@@ -74,36 +74,18 @@ export default function ProfilePage() {
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        padding: "12px 14px",
-        borderRadius: 10,
-        background: "#1a1a1c",
-      }}
-    >
-      <span style={{ opacity: 0.7 }}>{label}</span>
-      <span style={{ fontWeight: 600 }}>{value}</span>
+    <div className="wash-card flex justify-between px-4 py-3">
+      <span className="text-muted">{label}</span>
+      <span className="font-semibold text-chalk">{value}</span>
     </div>
   );
 }
 
 function StatCard({ label, value }: { label: string; value: number }) {
   return (
-    <div style={{ padding: 20, borderRadius: 12, background: "#1a1a1c", textAlign: "center" }}>
-      <div style={{ fontSize: 32, fontWeight: 700 }}>{value}</div>
-      <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>{label}</div>
+    <div className="wash-card px-4 py-5 text-center">
+      <div className="font-display text-3xl font-extrabold text-accent">{value}</div>
+      <div className="mt-1 text-xs text-muted">{label}</div>
     </div>
   );
 }
-
-const logoutButtonStyle: React.CSSProperties = {
-  width: "100%",
-  padding: 14,
-  borderRadius: 10,
-  border: "1px solid #333",
-  background: "transparent",
-  color: "#f87171",
-  fontSize: 15,
-};

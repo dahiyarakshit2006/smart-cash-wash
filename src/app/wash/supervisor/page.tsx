@@ -2,7 +2,8 @@
 
 // Supervisor view is intentionally English-only, plain text — the brief's
 // Hindi/English + icon-first requirement is scoped to worker-facing screens;
-// supervisors are office/ops staff.
+// supervisors are office/ops staff. Brand tokens/typography still apply for
+// visual consistency with the rest of /wash and the marketing site.
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -76,184 +77,175 @@ export default function SupervisorPage() {
   if (!clusterId || !clusterOverview) return null;
 
   return (
-    <div style={{ padding: 16, maxWidth: 720, margin: "0 auto", fontFamily: "sans-serif" }}>
-      <h1 style={{ fontSize: 22, marginBottom: 20 }}>Supervisor</h1>
+    <div className="mx-auto max-w-3xl px-6 py-8 font-sans text-chalk">
+      <h1 className="wash-heading mb-8">Supervisor</h1>
 
-      <section style={{ marginBottom: 32 }}>
-        <h2 style={sectionTitle}>Cluster overview</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          <div style={overviewCardStyle}>
-            <div style={{ fontSize: 12, opacity: 0.6, marginBottom: 8 }}>WORKERS</div>
+      <section className="mb-10">
+        <h2 className="wash-eyebrow mb-3">Cluster overview</h2>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="wash-card p-4">
+            <div className="wash-eyebrow mb-2">Workers</div>
             <MiniStat label="Started" value={clusterOverview.startedCount} of={clusterOverview.workerCount} />
-            <MiniStat label="Absent" value={clusterOverview.absentCount} of={clusterOverview.workerCount} color="#ef4444" />
+            <MiniStat
+              label="Absent"
+              value={clusterOverview.absentCount}
+              of={clusterOverview.workerCount}
+              colorClass="text-sodium"
+            />
           </div>
-          <div style={overviewCardStyle}>
-            <div style={{ fontSize: 12, opacity: 0.6, marginBottom: 8 }}>TODAY</div>
+          <div className="wash-card p-4">
+            <div className="wash-eyebrow mb-2">Today</div>
             <MiniStat label="Completed" value={clusterOverview.carsCompleted} of={clusterOverview.carsAssigned} />
-            <MiniStat label="Pending" value={clusterOverview.carsPending} of={clusterOverview.carsAssigned} color="#f59e0b" />
-            <MiniStat label="Issues" value={clusterOverview.carsIssues} of={clusterOverview.carsAssigned} color="#ef4444" />
+            <MiniStat
+              label="Pending"
+              value={clusterOverview.carsPending}
+              of={clusterOverview.carsAssigned}
+              colorClass="text-ice"
+            />
+            <MiniStat
+              label="Issues"
+              value={clusterOverview.carsIssues}
+              of={clusterOverview.carsAssigned}
+              colorClass="text-sodium"
+            />
           </div>
         </div>
       </section>
 
-      <section style={{ marginBottom: 32 }}>
-        <h2 style={sectionTitle}>Today's workers</h2>
-        {overview.map((w) => (
-          <div key={w.workerId} style={rowStyle}>
-            <div>
-              <div style={{ fontWeight: 600 }}>
-                {w.workerName} {!w.hasStarted && <span style={badgeStyle}>Not started</span>}
+      <section className="mb-10">
+        <h2 className="wash-eyebrow mb-3">Today's workers</h2>
+        <div className="flex flex-col gap-2">
+          {overview.map((w) => (
+            <div key={w.workerId} className="wash-card flex items-center justify-between px-4 py-3">
+              <div>
+                <div className="font-semibold text-chalk">
+                  {w.workerName} {!w.hasStarted && <Badge>Not started</Badge>}
+                </div>
+                <div className="text-sm text-muted">
+                  {w.societyName} · {w.doneCount}/{w.totalStops}
+                </div>
               </div>
-              <div style={{ fontSize: 13, opacity: 0.7 }}>
-                {w.societyName} · {w.doneCount}/{w.totalStops}
-              </div>
-            </div>
-            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              <button onClick={() => router.push(`/wash/supervisor/worker/${w.workerId}`)} style={viewRouteButtonStyle}>
-                View route
-              </button>
-              {w.routeId && (
-                <select
-                  defaultValue=""
-                  onChange={(e) => e.target.value && onReassign(w.routeId!, e.target.value)}
-                  style={selectStyle}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => router.push(`/wash/supervisor/worker/${w.workerId}`)}
+                  className="rounded-lg border border-line px-3 py-2 text-sm text-chalk transition-colors duration-150 hover:border-accent"
                 >
-                  <option value="" disabled>
-                    Reassign to…
-                  </option>
-                  {(reassignTargets[w.workerId] ?? []).map((t) => (
-                    <option key={t.workerId} value={t.workerId}>
-                      {t.name} (+{t.currentLoad})
+                  View route
+                </button>
+                {w.routeId && (
+                  <select
+                    defaultValue=""
+                    onChange={(e) => e.target.value && onReassign(w.routeId!, e.target.value)}
+                    className="rounded-lg border border-line bg-ink px-3 py-2 text-sm text-chalk"
+                  >
+                    <option value="" disabled>
+                      Reassign to…
                     </option>
-                  ))}
-                </select>
-              )}
+                    {(reassignTargets[w.workerId] ?? []).map((t) => (
+                      <option key={t.workerId} value={t.workerId}>
+                        {t.name} (+{t.currentLoad})
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </section>
 
-      <section style={{ marginBottom: 32 }}>
-        <h2 style={sectionTitle}>Quality spot-check ({spotCheck.length})</h2>
-        {spotCheck.map((s) => (
-          <button
-            key={s.washRecordId}
-            onClick={() => router.push(`/wash/supervisor/quality/${s.washRecordId}`)}
-            style={{ ...rowStyle, width: "100%", textAlign: "left", cursor: "pointer" }}
-          >
-            <div>
-              <div style={{ fontWeight: 600 }}>
-                {s.make} {s.model} · {s.tower} · Flat {s.flatNumber}
+      <section className="mb-10">
+        <h2 className="wash-eyebrow mb-3">Quality spot-check ({spotCheck.length})</h2>
+        <div className="flex flex-col gap-2">
+          {spotCheck.map((s) => (
+            <button
+              key={s.washRecordId}
+              onClick={() => router.push(`/wash/supervisor/quality/${s.washRecordId}`)}
+              className="wash-card flex w-full items-center justify-between px-4 py-3 text-left transition-colors duration-150 hover:border-accent/40"
+            >
+              <div>
+                <div className="font-semibold text-chalk">
+                  {s.make} {s.model} · {s.tower} · Flat {s.flatNumber}
+                </div>
+                <div className="text-sm text-muted">{s.workerName}</div>
               </div>
-              <div style={{ fontSize: 13, opacity: 0.7 }}>{s.workerName}</div>
-            </div>
-            <span style={{ opacity: 0.5 }}>→</span>
-          </button>
-        ))}
-        {spotCheck.length === 0 && <p style={emptyStyle}>Nothing pending.</p>}
+              <span className="text-muted">→</span>
+            </button>
+          ))}
+          {spotCheck.length === 0 && <p className="text-sm text-muted">Nothing pending.</p>}
+        </div>
       </section>
 
       <section>
-        <h2 style={sectionTitle}>Re-wash queue ({rewash.length})</h2>
-        {rewash.map((r) => (
-          <div key={r.washRecordId} style={rowStyle}>
-            <div>
-              <div style={{ fontWeight: 600 }}>
-                {r.tower} · Flat {r.flatNumber}
-                {r.priority && <PriorityBadge priority={r.priority} />}
+        <h2 className="wash-eyebrow mb-3">Re-wash queue ({rewash.length})</h2>
+        <div className="flex flex-col gap-2">
+          {rewash.map((r) => (
+            <div key={r.washRecordId} className="wash-card flex items-center justify-between px-4 py-3">
+              <div>
+                <div className="font-semibold text-chalk">
+                  {r.tower} · Flat {r.flatNumber}
+                  {r.priority && <PriorityBadge priority={r.priority} />}
+                </div>
+                <div className="text-sm text-muted">
+                  {r.workerName}
+                  {r.reason && ` · ${r.reason}`}
+                </div>
               </div>
-              <div style={{ fontSize: 13, opacity: 0.7 }}>
-                {r.workerName}
-                {r.reason && ` · ${r.reason}`}
-              </div>
+              <button
+                onClick={() => onClearRewash(r.washRecordId)}
+                className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-ink"
+              >
+                Cleared
+              </button>
             </div>
-            <button onClick={() => onClearRewash(r.washRecordId)} style={approveButtonStyle}>
-              Cleared
-            </button>
-          </div>
-        ))}
-        {rewash.length === 0 && <p style={emptyStyle}>Nothing pending.</p>}
+          ))}
+          {rewash.length === 0 && <p className="text-sm text-muted">Nothing pending.</p>}
+        </div>
       </section>
     </div>
   );
 }
 
-function MiniStat({ label, value, of, color }: { label: string; value: number; of: number; color?: string }) {
+function MiniStat({
+  label,
+  value,
+  of,
+  colorClass,
+}: {
+  label: string;
+  value: number;
+  of: number;
+  colorClass?: string;
+}) {
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, marginBottom: 4 }}>
-      <span style={{ opacity: 0.7 }}>{label}</span>
-      <span style={{ fontWeight: 600, color: color ?? "#fff" }}>
+    <div className="mb-1 flex justify-between text-sm">
+      <span className="text-muted">{label}</span>
+      <span className={`font-semibold ${colorClass ?? "text-chalk"}`}>
         {value} / {of}
       </span>
     </div>
   );
 }
 
+function Badge({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="ml-2 rounded-full bg-sodium/15 px-2 py-0.5 text-[0.65rem] uppercase tracking-wide text-sodium">
+      {children}
+    </span>
+  );
+}
+
 function PriorityBadge({ priority }: { priority: string }) {
-  const colors: Record<string, string> = { high: "#7c2d12", normal: "#3a3a1a", low: "#1a2a1a" };
+  const colorClass: Record<string, string> = {
+    high: "bg-sodium/20 text-sodium",
+    normal: "bg-ice/15 text-ice",
+    low: "bg-line text-muted",
+  };
   return (
     <span
-      style={{
-        fontSize: 10,
-        marginLeft: 8,
-        padding: "2px 6px",
-        borderRadius: 999,
-        background: colors[priority] ?? "#333",
-        textTransform: "uppercase",
-      }}
+      className={`ml-2 rounded-full px-2 py-0.5 text-[0.65rem] uppercase ${colorClass[priority] ?? "bg-line text-muted"}`}
     >
       {priority}
     </span>
   );
 }
-
-const sectionTitle: React.CSSProperties = { fontSize: 16, opacity: 0.8, marginBottom: 10 };
-const overviewCardStyle: React.CSSProperties = {
-  padding: 14,
-  borderRadius: 10,
-  border: "1px solid #2a2a2c",
-  background: "#1a1a1c",
-  color: "#fff",
-};
-const rowStyle: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  padding: "12px 14px",
-  borderRadius: 10,
-  border: "1px solid #2a2a2c",
-  background: "#1a1a1c",
-  color: "#fff",
-  marginBottom: 8,
-};
-const badgeStyle: React.CSSProperties = {
-  fontSize: 11,
-  marginLeft: 8,
-  padding: "2px 8px",
-  borderRadius: 999,
-  background: "#7c2d12",
-  color: "#fed7aa",
-};
-const selectStyle: React.CSSProperties = {
-  padding: "8px 10px",
-  borderRadius: 8,
-  background: "#0b0b0c",
-  color: "#fff",
-  border: "1px solid #333",
-};
-const viewRouteButtonStyle: React.CSSProperties = {
-  padding: "8px 12px",
-  borderRadius: 8,
-  border: "1px solid #333",
-  background: "transparent",
-  color: "#fff",
-  fontSize: 13,
-};
-const approveButtonStyle: React.CSSProperties = {
-  padding: "8px 14px",
-  borderRadius: 8,
-  border: "none",
-  background: "#22c55e",
-  color: "#fff",
-};
-const emptyStyle: React.CSSProperties = { opacity: 0.5, fontSize: 14 };

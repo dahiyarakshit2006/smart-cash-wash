@@ -23,38 +23,27 @@ export default function ConsentPage() {
   };
 
   return (
-    <div style={{ padding: 24, maxWidth: 480, margin: "0 auto" }}>
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
+    <div className="mx-auto max-w-md px-6 py-8">
+      <div className="mb-8 flex justify-end">
         <LangToggle />
       </div>
 
-      <h1 style={{ fontSize: 24, marginBottom: 24 }}>{t("consent_title")}</h1>
+      <h1 className="wash-heading mb-6">{t("consent_title")}</h1>
 
-      <p style={{ marginBottom: 16, lineHeight: 1.6 }}>{t("consent_body_1")}</p>
-      <p style={{ marginBottom: 24, lineHeight: 1.6 }}>{t("consent_body_2")}</p>
+      <p className="mb-4 leading-relaxed text-chalk/90">{t("consent_body_1")}</p>
+      <p className="mb-8 leading-relaxed text-muted">{t("consent_body_2")}</p>
 
-      <label style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 32 }}>
+      <label className="wash-card mb-8 flex items-center gap-4 px-5 py-4">
         <input
           type="checkbox"
           checked={geoConsent}
           onChange={(e) => setGeoConsent(e.target.checked)}
-          style={{ width: 24, height: 24 }}
+          className="h-6 w-6 accent-accent"
         />
-        <span>{t("consent_geo_toggle")}</span>
+        <span className="text-chalk">{t("consent_geo_toggle")}</span>
       </label>
 
-      <button
-        onClick={onAccept}
-        style={{
-          width: "100%",
-          padding: "18px",
-          fontSize: 18,
-          borderRadius: 8,
-          border: "none",
-          background: "#3b82f6",
-          color: "#fff",
-        }}
-      >
+      <button onClick={onAccept} className="wash-btn-primary">
         {t("consent_accept")}
       </button>
     </div>

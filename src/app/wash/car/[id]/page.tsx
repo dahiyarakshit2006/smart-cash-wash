@@ -141,9 +141,9 @@ export default function CarPage() {
   if (!stop) return null;
 
   return (
-    <div style={{ padding: 16, maxWidth: 480, margin: "0 auto", display: "flex", flexDirection: "column", gap: 16 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <button onClick={() => router.push("/wash/today")} style={backButtonStyle}>
+    <div className="mx-auto flex max-w-md flex-col gap-4 px-4 py-6">
+      <div className="flex items-center justify-between">
+        <button onClick={() => router.push("/wash/today")} className="rounded-lg border border-line px-3 py-2 text-sm text-chalk">
           ← {t("car_back")}
         </button>
         <SyncStatus />
@@ -154,7 +154,7 @@ export default function CarPage() {
         type="file"
         accept="image/*"
         capture="environment"
-        style={{ display: "none" }}
+        className="hidden"
         onChange={(e) => e.target.files?.[0] && onBeforeCapture(e.target.files[0])}
       />
       <input
@@ -162,7 +162,7 @@ export default function CarPage() {
         type="file"
         accept="image/*"
         capture="environment"
-        style={{ display: "none" }}
+        className="hidden"
         onChange={(e) => e.target.files?.[0] && onAfterCapture(e.target.files[0])}
       />
       <input
@@ -170,7 +170,7 @@ export default function CarPage() {
         type="file"
         accept="image/*"
         capture="environment"
-        style={{ display: "none" }}
+        className="hidden"
         onChange={(e) => e.target.files?.[0] && onDamagePhoto(e.target.files[0])}
       />
 
@@ -184,41 +184,43 @@ export default function CarPage() {
         />
       ) : (
         <>
-          <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 24, fontWeight: 700 }}>
+          <div className="text-center">
+            <div className="font-display text-2xl font-extrabold uppercase tracking-tightest text-chalk">
               🚗 {stop.make ?? ""} {stop.model ?? ""}
             </div>
-            <div style={{ fontSize: 15, opacity: 0.7, marginTop: 4 }}>{stop.registrationNumber}</div>
+            <div className="mt-1 text-base text-muted">{stop.registrationNumber}</div>
           </div>
 
           {step === "detail" && (
             <>
               <InfoBlock label={t("car_parking")} value={`${stop.tower} · ${stop.flatNumber}`} />
-              <BigButton icon="🧽" label={t("car_start_service")} onClick={onStartService} highlight />
+              <BigButton icon="🧽" label={t("car_start_service")} onClick={onStartService} />
             </>
           )}
 
           {step === "before" && (
             <>
               <StepLabel text={t("car_step_1")} />
-              <p style={{ textAlign: "center", opacity: 0.7 }}>{t("car_capture_before_body")}</p>
+              <p className="text-center text-muted">{t("car_capture_before_body")}</p>
               <BigButton icon="📷" label={t("car_capture_before_title")} onClick={() => beforeInputRef.current?.click()} />
             </>
           )}
 
           {step === "before_saved" && (
             <>
-              <p style={{ textAlign: "center", fontSize: 18 }}>{t("car_before_saved")}</p>
-              <BigButton icon="→" label={t("car_continue")} onClick={() => setStep("wash")} highlight />
+              <p className="text-center text-lg text-chalk">{t("car_before_saved")}</p>
+              <BigButton icon="→" label={t("car_continue")} onClick={() => setStep("wash")} />
             </>
           )}
 
           {step === "wash" && (
             <>
               <StepLabel text={t("car_step_2")} />
-              <p style={{ textAlign: "center", opacity: 0.7 }}>{t("car_wash_body")}</p>
-              <button style={linkButtonStyle}>{t("car_view_sop")}</button>
-              <BigButton icon="✅" label={t("car_washed")} onClick={() => setStep("after")} highlight />
+              <p className="text-center text-muted">{t("car_wash_body")}</p>
+              <button className="self-center font-mono text-sm text-ice underline underline-offset-4">
+                {t("car_view_sop")}
+              </button>
+              <BigButton icon="✅" label={t("car_washed")} onClick={() => setStep("after")} />
             </>
           )}
 
@@ -231,40 +233,35 @@ export default function CarPage() {
 
           {step === "ready" && (
             <>
-              <p style={{ textAlign: "center", fontSize: 16, opacity: 0.8 }}>
+              <p className="text-center text-base text-chalk/90">
                 {t("car_photo_before")} ✓ &nbsp; {t("car_photo_after")} ✓
               </p>
-              <BigButton icon="✅" label={t("car_complete_service")} onClick={onCompleteService} highlight />
+              <BigButton icon="✅" label={t("car_complete_service")} onClick={onCompleteService} />
             </>
           )}
 
           {step === "completed" && (
             <>
-              <p style={{ textAlign: "center", fontSize: 22 }}>{t("car_completed_title")}</p>
-              <BigButton icon="→" label={t("car_next_car")} onClick={onNextCar} highlight />
+              <p className="wash-greeting text-center">{t("car_completed_title")}</p>
+              <BigButton icon="→" label={t("car_next_car")} onClick={onNextCar} />
             </>
           )}
 
           {step !== "completed" && (
-            <div style={{ marginTop: 8 }}>
+            <div className="mt-2">
               {!reportIssueOpen ? (
-                <button onClick={() => setReportIssueOpen(true)} style={reportIssueButtonStyle}>
+                <button onClick={() => setReportIssueOpen(true)} className="wash-btn-warn">
                   {t("car_report_issue")}
                 </button>
               ) : (
                 <div>
-                  <p style={{ fontSize: 14, opacity: 0.7, marginBottom: 8 }}>{t("car_exception_prompt")}</p>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                  <p className="mb-2 text-sm text-muted">{t("car_exception_prompt")}</p>
+                  <div className="grid grid-cols-2 gap-2">
                     <SmallButton icon="🚗" label={t("car_not_in_slot")} onClick={() => onException("not_in_slot")} />
                     <SmallButton icon="🚫" label={t("car_declined")} onClick={() => onException("declined")} />
                     <SmallButton icon="🚘" label={t("car_blocked")} onClick={() => onException("blocked")} />
                     <SmallButton icon="✨" label={t("car_already_clean")} onClick={() => onException("already_clean")} />
-                    <SmallButton
-                      icon="⚠️"
-                      label={t("car_damage_flag")}
-                      onClick={onDamageCaptureClick}
-                      full
-                    />
+                    <SmallButton icon="⚠️" label={t("car_damage_flag")} onClick={onDamageCaptureClick} full />
                   </div>
                 </div>
               )}
@@ -293,9 +290,9 @@ function DamagePanel({
 
   if (flagged) {
     return (
-      <div style={{ textAlign: "center", padding: "40px 16px" }}>
-        <div style={{ fontSize: 22, marginBottom: 12 }}>{t("car_damage_flagged_title")}</div>
-        <p style={{ opacity: 0.8, marginBottom: 24 }}>{t("car_damage_flagged_body")}</p>
+      <div className="px-4 py-10 text-center">
+        <div className="wash-greeting mb-3">{t("car_damage_flagged_title")}</div>
+        <p className="mb-6 text-muted">{t("car_damage_flagged_body")}</p>
         <BigButton icon="←" label={t("car_back")} onClick={onDone} />
       </div>
     );
@@ -303,59 +300,36 @@ function DamagePanel({
 
   return (
     <div>
-      <div style={{ textAlign: "center", fontSize: 20, marginBottom: 16 }}>⚠ {t("car_damage_flag")}</div>
-      <p style={{ textAlign: "center", opacity: 0.7, marginBottom: 16 }}>{t("car_damage_photo")}</p>
-      <p style={{ textAlign: "center", marginBottom: 16 }}>{photoCount} 📷</p>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div className="mb-4 text-center font-display text-xl font-extrabold uppercase tracking-tightest text-sodium">
+        ⚠ {t("car_damage_flag")}
+      </div>
+      <p className="mb-4 text-center text-muted">{t("car_damage_photo")}</p>
+      <p className="mb-4 text-center text-chalk">{photoCount} 📷</p>
+      <div className="flex flex-col gap-2.5">
         <SmallButton icon="📷" label={t("car_add_another_photo")} onClick={onAddAnother} full />
-        <BigButton icon="⚠️" label={t("car_flag_damage_action")} onClick={onFlag} highlight />
+        <BigButton icon="⚠️" label={t("car_flag_damage_action")} onClick={onFlag} />
       </div>
     </div>
   );
 }
 
 function StepLabel({ text }: { text: string }) {
-  return <div style={{ textAlign: "center", fontSize: 13, opacity: 0.6, letterSpacing: 1 }}>{text.toUpperCase()}</div>;
+  return <div className="wash-eyebrow text-center">{text}</div>;
 }
 
 function InfoBlock({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{ textAlign: "center", padding: "16px 0" }}>
-      <div style={{ fontSize: 12, opacity: 0.6 }}>{label}</div>
-      <div style={{ fontSize: 20, fontWeight: 600 }}>{value}</div>
+    <div className="py-4 text-center">
+      <div className="wash-eyebrow">{label}</div>
+      <div className="mt-1 text-xl font-semibold text-chalk">{value}</div>
     </div>
   );
 }
 
-function BigButton({
-  icon,
-  label,
-  onClick,
-  highlight,
-}: {
-  icon: string;
-  label: string;
-  onClick: () => void;
-  highlight?: boolean;
-}) {
+function BigButton({ icon, label, onClick }: { icon: string; label: string; onClick: () => void }) {
   return (
-    <button
-      onClick={onClick}
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 8,
-        padding: "36px 16px",
-        borderRadius: 16,
-        border: "none",
-        background: highlight ? "#22c55e" : "#3b82f6",
-        color: "#fff",
-        fontSize: 19,
-      }}
-    >
-      <span style={{ fontSize: 44 }}>{icon}</span>
+    <button onClick={onClick} className="wash-btn-primary flex-col gap-2 py-9 text-lg">
+      <span className="text-5xl">{icon}</span>
       {label}
     </button>
   );
@@ -373,51 +347,9 @@ function SmallButton({
   full?: boolean;
 }) {
   return (
-    <button
-      onClick={onClick}
-      style={{
-        gridColumn: full ? "1 / -1" : undefined,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: 4,
-        padding: "16px 8px",
-        borderRadius: 12,
-        border: "1px solid #333",
-        background: "#1a1a1c",
-        color: "#fff",
-        fontSize: 13,
-      }}
-    >
-      <span style={{ fontSize: 22 }}>{icon}</span>
+    <button onClick={onClick} className={`wash-chip-btn ${full ? "col-span-2" : ""}`}>
+      <span className="text-2xl">{icon}</span>
       {label}
     </button>
   );
 }
-
-const backButtonStyle: React.CSSProperties = {
-  padding: "8px 12px",
-  borderRadius: 8,
-  border: "1px solid #333",
-  background: "transparent",
-  color: "#fff",
-};
-
-const linkButtonStyle: React.CSSProperties = {
-  alignSelf: "center",
-  background: "none",
-  border: "none",
-  color: "#3b82f6",
-  fontSize: 14,
-  textDecoration: "underline",
-};
-
-const reportIssueButtonStyle: React.CSSProperties = {
-  width: "100%",
-  padding: "12px",
-  borderRadius: 10,
-  border: "1px solid #7c2d12",
-  background: "#2a1610",
-  color: "#fca5a5",
-  fontSize: 14,
-};

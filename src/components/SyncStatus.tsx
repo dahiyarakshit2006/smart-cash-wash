@@ -31,16 +31,8 @@ export function SyncStatus() {
   const allSaved = unsynced === 0;
 
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 6,
-        fontSize: 12,
-        opacity: 0.75,
-      }}
-    >
-      <span style={{ color: allSaved ? "#22c55e" : "#f59e0b" }}>{allSaved ? "●" : "○"}</span>
+    <div className="flex items-center gap-1.5 font-mono text-xs text-muted">
+      <span className={allSaved ? "text-accent" : "text-sodium"}>{allSaved ? "●" : "○"}</span>
       {allSaved ? t("sync_all_saved") : online ? t("sync_saving") : t("sync_offline_saved")}
     </div>
   );

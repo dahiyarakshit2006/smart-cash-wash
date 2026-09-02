@@ -8,13 +8,13 @@ import { useT, LangToggle } from "@/lib/i18n";
 import { SyncStatus } from "@/components/SyncStatus";
 import { BottomNav } from "@/components/BottomNav";
 
-const STATE_STYLE: Record<string, { bg: string; icon: string }> = {
-  done: { bg: "#16241a", icon: "✓" },
-  not_in_slot: { bg: "#241616", icon: "❌" },
-  declined: { bg: "#241616", icon: "🚫" },
-  blocked: { bg: "#241616", icon: "⛔" },
-  already_clean: { bg: "#241616", icon: "✨" },
-  in_progress: { bg: "#241d16", icon: "→" },
+const STATE_STYLE: Record<string, { className: string; icon: string }> = {
+  done: { className: "bg-accent/10 border-accent/30", icon: "✓" },
+  not_in_slot: { className: "bg-sodium/10 border-sodium/30", icon: "❌" },
+  declined: { className: "bg-sodium/10 border-sodium/30", icon: "🚫" },
+  blocked: { className: "bg-sodium/10 border-sodium/30", icon: "⛔" },
+  already_clean: { className: "bg-sodium/10 border-sodium/30", icon: "✨" },
+  in_progress: { className: "bg-ice/10 border-ice/30", icon: "→" },
 };
 
 export default function TodayPage() {
@@ -49,11 +49,11 @@ export default function TodayPage() {
 
   if (route === null) {
     return (
-      <div style={{ padding: 24, textAlign: "center", paddingBottom: 80 }}>
-        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
+      <div className="px-6 pb-24 pt-8 text-center">
+        <div className="mb-8 flex justify-end">
           <LangToggle />
         </div>
-        <p style={{ fontSize: 20, marginTop: 60 }}>{t("route_no_route")}</p>
+        <p className="wash-greeting mt-16">{t("route_no_route")}</p>
         <BottomNav />
       </div>
     );
@@ -63,79 +63,55 @@ export default function TodayPage() {
   const pct = route.totalStops > 0 ? Math.round((route.doneCount / route.totalStops) * 100) : 0;
 
   return (
-    <div style={{ padding: 16, maxWidth: 480, margin: "0 auto", paddingBottom: 90 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-        <div style={{ fontSize: 20, fontWeight: 600 }}>
+    <div className="mx-auto max-w-md px-4 pb-24 pt-6">
+      <div className="mb-4 flex items-center justify-between">
+        <div className="wash-greeting">
           {t("today_greeting")}, {workerName} 👋
         </div>
         <LangToggle />
       </div>
 
-      <div style={{ marginBottom: 6, fontSize: 13, opacity: 0.6 }}>{route.societyName}</div>
+      <div className="wash-eyebrow mb-6">{route.societyName}</div>
 
-      <div style={{ marginBottom: 20 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, opacity: 0.8, marginBottom: 6 }}>
+      <div className="mb-6">
+        <div className="mb-2 flex justify-between text-sm text-muted">
           <span>{t("today_progress")}</span>
-          <span>
+          <span className="text-chalk">
             {route.doneCount} / {route.totalStops}
           </span>
         </div>
-        <div style={{ height: 10, borderRadius: 999, background: "#1a1a1c", overflow: "hidden" }}>
-          <div style={{ height: "100%", width: `${pct}%`, background: "#22c55e", transition: "width 0.3s" }} />
+        <div className="h-2.5 overflow-hidden rounded-full bg-raised">
+          <div className="h-full rounded-full bg-accent transition-[width] duration-150" style={{ width: `${pct}%` }} />
         </div>
       </div>
 
       {next ? (
-        <div
-          style={{
-            padding: 20,
-            borderRadius: 16,
-            background: "#1a2a4a",
-            border: "1px solid #2c4a7c",
-            marginBottom: 24,
-          }}
-        >
-          <div style={{ fontSize: 12, opacity: 0.7, marginBottom: 8, letterSpacing: 1 }}>
-            {t("today_next_car").toUpperCase()}
-          </div>
-          <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>
+        <div className="wash-card mb-6 border-accent/30 p-5">
+          <div className="wash-eyebrow mb-2 text-accent">{t("today_next_car")}</div>
+          <div className="mb-1 font-display text-2xl font-extrabold uppercase tracking-tightest text-chalk">
             {next.make ?? ""} {next.model ?? ""}
           </div>
-          <div style={{ fontSize: 15, opacity: 0.8, marginBottom: 4 }}>{next.registrationNumber}</div>
-          <div style={{ fontSize: 14, opacity: 0.7, marginBottom: 16 }}>
+          <div className="mb-1 text-base text-chalk/80">{next.registrationNumber}</div>
+          <div className="mb-5 text-sm text-muted">
             {t("car_parking")}: {next.tower} - {next.flatNumber}
           </div>
-          <button
-            onClick={() => router.push(`/wash/car/${next.routeStopId}`)}
-            style={{
-              width: "100%",
-              padding: 16,
-              borderRadius: 12,
-              border: "none",
-              background: "#3b82f6",
-              color: "#fff",
-              fontSize: 18,
-              fontWeight: 600,
-            }}
-          >
+          <button onClick={() => router.push(`/wash/car/${next.routeStopId}`)} className="wash-btn-primary">
             {t("today_start_car")}
           </button>
         </div>
       ) : (
-        <div style={{ textAlign: "center", padding: "40px 0", fontSize: 20, marginBottom: 24 }}>
-          {t("today_all_done")}
-        </div>
+        <div className="wash-greeting mb-6 py-10 text-center">{t("today_all_done")}</div>
       )}
 
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-        <h2 style={{ fontSize: 15, opacity: 0.8 }}>{t("today_your_route")}</h2>
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="wash-eyebrow">{t("today_your_route")}</h2>
         <SyncStatus />
       </div>
 
       {Object.entries(route.stopsByTower).map(([tower, stops]) => (
-        <div key={tower} style={{ marginBottom: 16 }}>
-          <h3 style={{ fontSize: 13, opacity: 0.6, marginBottom: 6 }}>{tower}</h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        <div key={tower} className="mb-4">
+          <h3 className="mb-2 text-xs text-muted">{tower}</h3>
+          <div className="flex flex-col gap-1.5">
             {stops.map((stop) => (
               <RouteRow key={stop.routeStopId} stop={stop} onOpen={() => router.push(`/wash/car/${stop.routeStopId}`)} />
             ))}
@@ -155,17 +131,9 @@ function RouteRow({ stop, onOpen }: { stop: RouteStopWithVehicle; onOpen: () => 
   return (
     <button
       onClick={onOpen}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "12px 16px",
-        borderRadius: 10,
-        border: "1px solid #2a2a2c",
-        background: style?.bg ?? "#1a1a1c",
-        color: "#fff",
-        fontSize: 15,
-      }}
+      className={`flex items-center justify-between rounded-xl border px-4 py-3 text-base text-chalk transition-colors duration-150 ${
+        style?.className ?? "border-line bg-raised"
+      }`}
     >
       <span>
         🚗 {stop.make ?? ""} {stop.model ?? ""}

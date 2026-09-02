@@ -17,28 +17,17 @@ export default function TrainingPage() {
   const t = useT();
 
   return (
-    <div style={{ padding: 16, maxWidth: 480, margin: "0 auto", paddingBottom: 90 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 20 }}>
-        <h1 style={{ fontSize: 20 }}>{t("training_title")}</h1>
+    <div className="mx-auto max-w-md px-4 pb-24 pt-6">
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="wash-heading">{t("training_title")}</h1>
         <LangToggle />
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div className="flex flex-col gap-2.5">
         {CATEGORIES.map((c) => (
-          <div
-            key={c.key}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 14,
-              padding: 16,
-              borderRadius: 12,
-              border: "1px solid #2a2a2c",
-              background: "#1a1a1c",
-            }}
-          >
-            <span style={{ fontSize: 28 }}>{c.icon}</span>
-            <span style={{ fontSize: 16 }}>{t(c.key)}</span>
+          <div key={c.key} className="wash-card flex items-center gap-4 px-4 py-4">
+            <span className="text-3xl">{c.icon}</span>
+            <span className="text-base text-chalk">{t(c.key)}</span>
           </div>
         ))}
       </div>

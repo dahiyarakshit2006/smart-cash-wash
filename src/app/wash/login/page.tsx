@@ -34,12 +34,15 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ padding: 24, maxWidth: 420, margin: "0 auto" }}>
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
+    <div className="mx-auto max-w-md px-6 py-8">
+      <div className="mb-8 flex items-center justify-between">
+        <span className="font-display text-lg font-extrabold uppercase tracking-tightest text-chalk">
+          DHRUVA <span className="text-muted">WASH</span>
+        </span>
         <LangToggle />
       </div>
 
-      <h1 style={{ fontSize: 24, marginBottom: 24 }}>{t("login_title")}</h1>
+      <h1 className="wash-heading mb-8">{t("login_title")}</h1>
 
       {!otpSent ? (
         <>
@@ -49,51 +52,30 @@ export default function LoginPage() {
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             placeholder={t("login_phone_placeholder")}
-            style={inputStyle}
+            className="wash-field mb-4"
           />
-          <button onClick={onSendOtp} style={buttonStyle} disabled={phone.length < 10}>
+          <button onClick={onSendOtp} className="wash-btn-primary" disabled={phone.length < 10}>
             {t("login_send_otp")}
           </button>
         </>
       ) : (
         <>
-          <p style={{ marginBottom: 12 }}>{t("login_enter_otp")}</p>
+          <p className="wash-eyebrow mb-3">{t("login_enter_otp")}</p>
           <input
             type="tel"
             inputMode="numeric"
             value={code}
             onChange={(e) => setCode(e.target.value)}
             maxLength={6}
-            style={inputStyle}
+            className="wash-field mb-4"
           />
-          <button onClick={onVerify} style={buttonStyle} disabled={code.length !== 6}>
+          <button onClick={onVerify} className="wash-btn-primary" disabled={code.length !== 6}>
             {t("login_verify")}
           </button>
         </>
       )}
 
-      {error && <p style={{ color: "#ff6b6b", marginTop: 16 }}>{error}</p>}
+      {error && <p className="mt-4 text-sm text-sodium">{error}</p>}
     </div>
   );
 }
-
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  padding: "16px",
-  fontSize: 20,
-  marginBottom: 16,
-  borderRadius: 8,
-  border: "1px solid #333",
-  background: "#1a1a1c",
-  color: "#fff",
-};
-
-const buttonStyle: React.CSSProperties = {
-  width: "100%",
-  padding: "16px",
-  fontSize: 18,
-  borderRadius: 8,
-  border: "none",
-  background: "#3b82f6",
-  color: "#fff",
-};

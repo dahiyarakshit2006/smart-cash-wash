@@ -94,37 +94,47 @@ export default function QualityCheckPage() {
   if (!detail) return null;
 
   return (
-    <div style={{ padding: 16, maxWidth: 560, margin: "0 auto", fontFamily: "sans-serif", color: "#fff" }}>
-      <button onClick={() => router.push("/wash/supervisor")} style={backButtonStyle}>
+    <div className="mx-auto max-w-xl px-6 py-8 font-sans text-chalk">
+      <button
+        onClick={() => router.push("/wash/supervisor")}
+        className="rounded-lg border border-line px-3 py-2 text-sm text-chalk"
+      >
         ← Back
       </button>
 
-      <h1 style={{ fontSize: 20, margin: "16px 0 4px" }}>
+      <h1 className="mb-1 mt-4 font-display text-xl font-extrabold uppercase tracking-tightest">
         {detail.make} {detail.model}
       </h1>
-      <p style={{ opacity: 0.7, marginBottom: 20 }}>
+      <p className="mb-6 text-muted">
         {detail.tower} · Flat {detail.flatNumber} · {detail.workerName}
       </p>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 24 }}>
+      <div className="mb-6 grid grid-cols-2 gap-3">
         <PhotoBlock label="Before" url={images.before} />
         <PhotoBlock label="After" url={images.after} />
       </div>
 
       {!rewashMode ? (
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          <button onClick={onApprove} style={approveButtonStyle}>
+        <div className="flex flex-col gap-2.5">
+          <button onClick={onApprove} className="rounded-xl bg-accent px-4 py-4 text-base font-semibold text-ink">
             ✅ Approved
           </button>
-          <button onClick={() => setRewashMode(true)} style={rewashButtonStyle}>
+          <button
+            onClick={() => setRewashMode(true)}
+            className="rounded-xl bg-sodium px-4 py-4 text-base font-semibold text-ink"
+          >
             🔁 Re-wash
           </button>
-          <button style={investigateButtonStyle}>🔎 Investigate</button>
+          <button className="rounded-xl border border-line px-4 py-4 text-base text-chalk">🔎 Investigate</button>
         </div>
       ) : (
         <div>
-          <p style={{ fontSize: 13, opacity: 0.7, marginBottom: 6 }}>Reason</p>
-          <select value={reason} onChange={(e) => setReason(e.target.value as RewashReason)} style={selectStyle}>
+          <p className="wash-eyebrow mb-2">Reason</p>
+          <select
+            value={reason}
+            onChange={(e) => setReason(e.target.value as RewashReason)}
+            className="w-full rounded-lg border border-line bg-ink px-3 py-3 text-chalk"
+          >
             {REASONS.map((r) => (
               <option key={r.value} value={r.value}>
                 {r.label}
@@ -132,28 +142,22 @@ export default function QualityCheckPage() {
             ))}
           </select>
 
-          <p style={{ fontSize: 13, opacity: 0.7, margin: "14px 0 6px" }}>Priority</p>
-          <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+          <p className="wash-eyebrow mb-2 mt-4">Priority</p>
+          <div className="mb-6 flex gap-2">
             {PRIORITIES.map((p) => (
               <button
                 key={p}
                 onClick={() => setPriority(p)}
-                style={{
-                  flex: 1,
-                  padding: 10,
-                  borderRadius: 8,
-                  border: priority === p ? "2px solid #f59e0b" : "1px solid #333",
-                  background: priority === p ? "#3a2a10" : "#1a1a1c",
-                  color: "#fff",
-                  textTransform: "capitalize",
-                }}
+                className={`flex-1 rounded-lg px-3 py-2.5 capitalize transition-colors duration-150 ${
+                  priority === p ? "border-2 border-sodium bg-sodium/15 text-sodium" : "border border-line bg-raised text-chalk"
+                }`}
               >
                 {p}
               </button>
             ))}
           </div>
 
-          <button onClick={onConfirmRewash} style={rewashButtonStyle}>
+          <button onClick={onConfirmRewash} className="w-full rounded-xl bg-sodium px-4 py-4 text-base font-semibold text-ink">
             Confirm re-wash
           </button>
         </div>
@@ -165,65 +169,15 @@ export default function QualityCheckPage() {
 function PhotoBlock({ label, url }: { label: string; url: string | null }) {
   return (
     <div>
-      <p style={{ fontSize: 12, opacity: 0.6, marginBottom: 6 }}>{label}</p>
-      <div
-        style={{
-          aspectRatio: "4/3",
-          borderRadius: 10,
-          background: "#1a1a1c",
-          overflow: "hidden",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
+      <p className="mb-1.5 text-xs text-muted">{label}</p>
+      <div className="flex aspect-[4/3] items-center justify-center overflow-hidden rounded-lg bg-raised">
         {url ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={url} alt={label} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <img src={url} alt={label} className="h-full w-full object-cover" />
         ) : (
-          <span style={{ opacity: 0.4, fontSize: 12 }}>No photo</span>
+          <span className="text-xs text-muted">No photo</span>
         )}
       </div>
     </div>
   );
 }
-
-const backButtonStyle: React.CSSProperties = {
-  padding: "8px 12px",
-  borderRadius: 8,
-  border: "1px solid #333",
-  background: "transparent",
-  color: "#fff",
-};
-const approveButtonStyle: React.CSSProperties = {
-  padding: 16,
-  borderRadius: 10,
-  border: "none",
-  background: "#22c55e",
-  color: "#fff",
-  fontSize: 16,
-};
-const rewashButtonStyle: React.CSSProperties = {
-  padding: 16,
-  borderRadius: 10,
-  border: "none",
-  background: "#f59e0b",
-  color: "#000",
-  fontSize: 16,
-};
-const investigateButtonStyle: React.CSSProperties = {
-  padding: 16,
-  borderRadius: 10,
-  border: "1px solid #333",
-  background: "transparent",
-  color: "#fff",
-  fontSize: 16,
-};
-const selectStyle: React.CSSProperties = {
-  width: "100%",
-  padding: 12,
-  borderRadius: 8,
-  background: "#0b0b0c",
-  color: "#fff",
-  border: "1px solid #333",
-};

@@ -100,6 +100,60 @@ body {
     @apply w-full rounded-lg border border-line bg-ink/60 px-4 py-3 text-sm text-chalk
            placeholder:text-muted/60 transition-colors focus:border-accent focus:outline-none;
   }
+
+  /* ---- /wash worker UI ----
+     Same brand tokens/fonts as the marketing site, but no backdrop-blur
+     (compositing cost on low-end Android) and no transitions above 150ms —
+     a worker tapping through a car 50x a shift cannot wait on polish. */
+
+  .wash-eyebrow {
+    @apply font-mono text-xs uppercase tracking-widest2 text-muted;
+  }
+
+  .wash-greeting {
+    @apply font-serif italic text-chalk;
+    font-size: clamp(1.4rem, 5vw, 1.9rem);
+    line-height: 1.1;
+  }
+
+  .wash-heading {
+    @apply font-display font-extrabold uppercase tracking-tightest text-chalk leading-[0.95];
+    font-size: clamp(1.4rem, 5vw, 1.9rem);
+  }
+
+  .wash-card {
+    @apply rounded-2xl border border-line bg-raised;
+  }
+
+  .wash-field {
+    @apply w-full rounded-xl border border-line bg-raised px-5 py-4 text-lg text-chalk
+           placeholder:text-muted/60 transition-colors focus:border-accent focus:outline-none;
+  }
+
+  /* Primary action: large touch target, instant-feeling (150ms max). */
+  .wash-btn-primary {
+    @apply flex w-full items-center justify-center gap-3 rounded-2xl bg-accent px-6 py-5
+           text-lg font-semibold text-ink transition-colors duration-150
+           disabled:opacity-40 active:bg-white;
+  }
+
+  .wash-btn-secondary {
+    @apply flex w-full items-center justify-center gap-3 rounded-2xl border border-line
+           bg-raised px-6 py-5 text-lg font-semibold text-chalk transition-colors duration-150
+           active:border-accent;
+  }
+
+  /* Report-issue / exception surface: sodium (warning), not destructive red —
+     matches the marketing site's accent-color vocabulary. */
+  .wash-btn-warn {
+    @apply flex w-full items-center justify-center gap-2 rounded-xl border border-sodium/40
+           bg-sodium/10 px-4 py-3 text-sm font-medium text-sodium transition-colors duration-150;
+  }
+
+  .wash-chip-btn {
+    @apply flex flex-col items-center gap-1 rounded-xl border border-line bg-raised
+           px-3 py-4 text-sm text-chalk transition-colors duration-150 active:border-accent;
+  }
 }
 
 /* Stage sections sit above the fixed VideoBackdrop (z-0) and stay legible

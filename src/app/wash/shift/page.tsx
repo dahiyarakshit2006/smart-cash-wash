@@ -58,17 +58,17 @@ export default function ShiftPage() {
   const ended = !!summary.shiftEndAt;
 
   return (
-    <div style={{ padding: 16, maxWidth: 480, margin: "0 auto", paddingBottom: 90 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 20 }}>
-        <h1 style={{ fontSize: 20 }}>{t("shift_title")}</h1>
+    <div className="mx-auto max-w-md px-4 pb-24 pt-6">
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="wash-heading">{t("shift_title")}</h1>
         <LangToggle />
       </div>
 
       {notStarted && (
-        <div style={{ textAlign: "center", padding: "24px 0" }}>
-          <div style={{ fontSize: 16, opacity: 0.7, marginBottom: 8 }}>{t("shift_assigned_cars")}</div>
-          <div style={{ fontSize: 48, fontWeight: 700, marginBottom: 24 }}>{summary.totalStops}</div>
-          <button onClick={onStart} style={primaryButtonStyle}>
+        <div className="py-6 text-center">
+          <div className="wash-eyebrow mb-2">{t("shift_assigned_cars")}</div>
+          <div className="mb-8 font-display text-6xl font-black text-chalk">{summary.totalStops}</div>
+          <button onClick={onStart} className="wash-btn-primary">
             {t("shift_start")}
           </button>
         </div>
@@ -76,25 +76,25 @@ export default function ShiftPage() {
 
       {!notStarted && !ended && (
         <>
-          <h2 style={{ fontSize: 15, opacity: 0.8, marginBottom: 12 }}>{t("shift_progress")}</h2>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 24 }}>
-            <StatCard label={t("shift_completed")} value={summary.completedCount} color="#22c55e" />
-            <StatCard label={t("shift_pending")} value={summary.pendingCount} color="#f59e0b" />
-            <StatCard label={t("shift_issues")} value={summary.issueCount} color="#ef4444" />
+          <h2 className="wash-eyebrow mb-3">{t("shift_progress")}</h2>
+          <div className="mb-6 grid grid-cols-3 gap-2">
+            <StatCard label={t("shift_completed")} value={summary.completedCount} colorClass="text-accent" />
+            <StatCard label={t("shift_pending")} value={summary.pendingCount} colorClass="text-ice" />
+            <StatCard label={t("shift_issues")} value={summary.issueCount} colorClass="text-sodium" />
           </div>
-          <button onClick={onEnd} style={secondaryButtonStyle}>
+          <button onClick={onEnd} className="wash-btn-secondary">
             {t("shift_end")}
           </button>
         </>
       )}
 
       {ended && (
-        <div style={{ textAlign: "center", padding: "24px 0" }}>
-          <div style={{ fontSize: 22, marginBottom: 20 }}>{t("shift_complete_title")}</div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
-            <StatCard label={t("shift_completed")} value={summary.completedCount} color="#22c55e" />
-            <StatCard label={t("shift_pending")} value={summary.pendingCount} color="#f59e0b" />
-            <StatCard label={t("shift_exceptions")} value={summary.issueCount} color="#ef4444" />
+        <div className="py-6 text-center">
+          <div className="wash-greeting mb-6">{t("shift_complete_title")}</div>
+          <div className="grid grid-cols-3 gap-2">
+            <StatCard label={t("shift_completed")} value={summary.completedCount} colorClass="text-accent" />
+            <StatCard label={t("shift_pending")} value={summary.pendingCount} colorClass="text-ice" />
+            <StatCard label={t("shift_exceptions")} value={summary.issueCount} colorClass="text-sodium" />
           </div>
         </div>
       )}
@@ -104,32 +104,11 @@ export default function ShiftPage() {
   );
 }
 
-function StatCard({ label, value, color }: { label: string; value: number; color: string }) {
+function StatCard({ label, value, colorClass }: { label: string; value: number; colorClass: string }) {
   return (
-    <div style={{ padding: "16px 8px", borderRadius: 12, background: "#1a1a1c", textAlign: "center" }}>
-      <div style={{ fontSize: 24, fontWeight: 700, color }}>{value}</div>
-      <div style={{ fontSize: 11, opacity: 0.7, marginTop: 4 }}>{label}</div>
+    <div className="wash-card px-2 py-4 text-center">
+      <div className={`font-display text-2xl font-extrabold ${colorClass}`}>{value}</div>
+      <div className="mt-1 text-xs text-muted">{label}</div>
     </div>
   );
 }
-
-const primaryButtonStyle: React.CSSProperties = {
-  width: "100%",
-  padding: 18,
-  borderRadius: 12,
-  border: "none",
-  background: "#3b82f6",
-  color: "#fff",
-  fontSize: 18,
-  fontWeight: 600,
-};
-
-const secondaryButtonStyle: React.CSSProperties = {
-  width: "100%",
-  padding: 16,
-  borderRadius: 12,
-  border: "1px solid #333",
-  background: "transparent",
-  color: "#fff",
-  fontSize: 16,
-};

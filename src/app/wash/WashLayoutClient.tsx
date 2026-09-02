@@ -11,7 +11,7 @@ export default function WashLayoutClient({ children }: { children: React.ReactNo
 
   return (
     <LangProvider>
-      <div style={{ minHeight: "100vh", background: "#0b0b0c", color: "#f5f5f5" }}>{children}</div>
+      <div className="min-h-screen bg-ink font-sans text-chalk">{children}</div>
     </LangProvider>
   );
 }
