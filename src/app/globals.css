@@ -49,6 +49,21 @@ body {
     font-size: clamp(1.9rem, 3.6vw, 3.1rem);
   }
 
+  /* Two-voice headline system: heavy sans caps for the factual claim,
+     italic serif for the human counterpoint. */
+  .display-caps {
+    @apply font-display font-black uppercase leading-[0.95];
+    letter-spacing: -0.02em;
+    font-size: clamp(2.1rem, 6.4vw, 5.5rem);
+  }
+
+  .display-serif {
+    @apply font-serif italic text-ice/70 normal-case;
+    letter-spacing: 0;
+    font-size: 1.1em;
+    line-height: 0.95;
+  }
+
   /* The mono eyebrow is the "operating system" tell — used for stage numbers,
      metrics and labels, never for prose. */
   .eyebrow {

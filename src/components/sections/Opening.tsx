@@ -15,8 +15,9 @@ export function Hero() {
         </Reveal>
 
         <Reveal delay={0.08}>
-          <h1 className="display max-w-[19ch]">
-            Professionally managed car washing for your society.
+          <h1 className="display-caps max-w-[19ch]">
+            Professionally managed car washing{' '}
+            <span className="display-serif">for your society.</span>
           </h1>
         </Reveal>
 
@@ -29,7 +30,8 @@ export function Hero() {
 
         <Reveal delay={0.22}>
           <p className="lede mt-4 text-muted">
-            The alternative to whoever currently washes your car in the basement.
+            The <span className="font-semibold text-chalk">alternative</span> to whoever
+            currently washes your car in the basement.
           </p>
         </Reveal>
 
