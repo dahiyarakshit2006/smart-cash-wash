@@ -140,6 +140,11 @@ export async function getPhotosAwaitingCompression(): Promise<QueuedPhoto[]> {
   return all.filter((p) => p.status === "pending_compression");
 }
 
+export async function getUnsyncedCount(): Promise<number> {
+  const all = await getAllPhotos();
+  return all.filter((p) => p.status !== "uploaded").length;
+}
+
 // Config store lets the service worker (which can't read process.env)
 // upload directly from IndexedDB even when no app window is open —
 // required for Background Sync to actually work while the app is closed.

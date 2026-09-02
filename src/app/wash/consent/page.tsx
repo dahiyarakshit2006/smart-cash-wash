@@ -19,7 +19,7 @@ export default function ConsentPage() {
     const session = getSession();
     if (!session) return;
     await acceptConsent(session.workerId, geoConsent);
-    router.push(session.role === "supervisor" ? "/wash/supervisor" : "/wash/route");
+    router.push(session.role === "supervisor" ? "/wash/supervisor" : "/wash/today");
   };
 
   return (

@@ -1,41 +1,44 @@
 "use client";
 
 // Supervisor view is intentionally English-only, plain text — the brief's
-// Hindi/English + icon-first requirement (section 5's sibling constraint)
-// is scoped to worker-facing screens; supervisors are office/ops staff.
+// Hindi/English + icon-first requirement is scoped to worker-facing screens;
+// supervisors are office/ops staff.
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import {
+  ClusterOverview,
   ReassignTarget,
   RewashItem,
   SpotCheckItem,
   WorkerCompletion,
   clearRewash,
+  getClusterOverview,
   getReassignTargets,
   getRewashQueue,
   getSpotCheckQueue,
   getSupervisorOverview,
   reassignRoute,
-  signOff,
 } from "@/lib/wash-data";
 
 export default function SupervisorPage() {
   const router = useRouter();
-  const [supervisorId, setSupervisorId] = useState<string | null>(null);
   const [clusterId, setClusterId] = useState<string | null>(null);
+  const [clusterOverview, setClusterOverview] = useState<ClusterOverview | null>(null);
   const [overview, setOverview] = useState<WorkerCompletion[]>([]);
   const [reassignTargets, setReassignTargets] = useState<Record<string, ReassignTarget[]>>({});
   const [spotCheck, setSpotCheck] = useState<SpotCheckItem[]>([]);
   const [rewash, setRewash] = useState<RewashItem[]>([]);
 
   const loadAll = async (cId: string) => {
-    const [ov, sc, rw] = await Promise.all([
+    const [co, ov, sc, rw] = await Promise.all([
+      getClusterOverview(cId),
       getSupervisorOverview(cId),
       getSpotCheckQueue(cId),
       getRewashQueue(cId),
     ]);
+    setClusterOverview(co);
     setOverview(ov);
     setSpotCheck(sc);
     setRewash(rw);
@@ -54,7 +57,6 @@ export default function SupervisorPage() {
         router.replace("/wash/login");
         return;
       }
-      setSupervisorId(session.workerId);
       setClusterId(session.clusterId);
       await loadAll(session.clusterId);
     })();
@@ -66,28 +68,33 @@ export default function SupervisorPage() {
     if (clusterId) await loadAll(clusterId);
   };
 
-  const onApprove = async (washRecordId: string) => {
-    if (!supervisorId || !clusterId) return;
-    await signOff(washRecordId, supervisorId, false);
-    await loadAll(clusterId);
-  };
-
-  const onNeedsRewash = async (washRecordId: string) => {
-    if (!supervisorId || !clusterId) return;
-    await signOff(washRecordId, supervisorId, true);
-    await loadAll(clusterId);
-  };
-
   const onClearRewash = async (washRecordId: string) => {
     await clearRewash(washRecordId);
     if (clusterId) await loadAll(clusterId);
   };
 
-  if (!supervisorId) return null;
+  if (!clusterId || !clusterOverview) return null;
 
   return (
     <div style={{ padding: 16, maxWidth: 720, margin: "0 auto", fontFamily: "sans-serif" }}>
       <h1 style={{ fontSize: 22, marginBottom: 20 }}>Supervisor</h1>
+
+      <section style={{ marginBottom: 32 }}>
+        <h2 style={sectionTitle}>Cluster overview</h2>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <div style={overviewCardStyle}>
+            <div style={{ fontSize: 12, opacity: 0.6, marginBottom: 8 }}>WORKERS</div>
+            <MiniStat label="Started" value={clusterOverview.startedCount} of={clusterOverview.workerCount} />
+            <MiniStat label="Absent" value={clusterOverview.absentCount} of={clusterOverview.workerCount} color="#ef4444" />
+          </div>
+          <div style={overviewCardStyle}>
+            <div style={{ fontSize: 12, opacity: 0.6, marginBottom: 8 }}>TODAY</div>
+            <MiniStat label="Completed" value={clusterOverview.carsCompleted} of={clusterOverview.carsAssigned} />
+            <MiniStat label="Pending" value={clusterOverview.carsPending} of={clusterOverview.carsAssigned} color="#f59e0b" />
+            <MiniStat label="Issues" value={clusterOverview.carsIssues} of={clusterOverview.carsAssigned} color="#ef4444" />
+          </div>
+        </div>
+      </section>
 
       <section style={{ marginBottom: 32 }}>
         <h2 style={sectionTitle}>Today's workers</h2>
@@ -101,22 +108,27 @@ export default function SupervisorPage() {
                 {w.societyName} · {w.doneCount}/{w.totalStops}
               </div>
             </div>
-            {w.routeId && (
-              <select
-                defaultValue=""
-                onChange={(e) => e.target.value && onReassign(w.routeId!, e.target.value)}
-                style={selectStyle}
-              >
-                <option value="" disabled>
-                  Reassign to…
-                </option>
-                {(reassignTargets[w.workerId] ?? []).map((t) => (
-                  <option key={t.workerId} value={t.workerId}>
-                    {t.name}
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <button onClick={() => router.push(`/wash/supervisor/worker/${w.workerId}`)} style={viewRouteButtonStyle}>
+                View route
+              </button>
+              {w.routeId && (
+                <select
+                  defaultValue=""
+                  onChange={(e) => e.target.value && onReassign(w.routeId!, e.target.value)}
+                  style={selectStyle}
+                >
+                  <option value="" disabled>
+                    Reassign to…
                   </option>
-                ))}
-              </select>
-            )}
+                  {(reassignTargets[w.workerId] ?? []).map((t) => (
+                    <option key={t.workerId} value={t.workerId}>
+                      {t.name} (+{t.currentLoad})
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
           </div>
         ))}
       </section>
@@ -124,22 +136,19 @@ export default function SupervisorPage() {
       <section style={{ marginBottom: 32 }}>
         <h2 style={sectionTitle}>Quality spot-check ({spotCheck.length})</h2>
         {spotCheck.map((s) => (
-          <div key={s.washRecordId} style={rowStyle}>
+          <button
+            key={s.washRecordId}
+            onClick={() => router.push(`/wash/supervisor/quality/${s.washRecordId}`)}
+            style={{ ...rowStyle, width: "100%", textAlign: "left", cursor: "pointer" }}
+          >
             <div>
               <div style={{ fontWeight: 600 }}>
-                {s.tower} · Flat {s.flatNumber}
+                {s.make} {s.model} · {s.tower} · Flat {s.flatNumber}
               </div>
               <div style={{ fontSize: 13, opacity: 0.7 }}>{s.workerName}</div>
             </div>
-            <div style={{ display: "flex", gap: 8 }}>
-              <button onClick={() => onApprove(s.washRecordId)} style={approveButtonStyle}>
-                ✅ Approve
-              </button>
-              <button onClick={() => onNeedsRewash(s.washRecordId)} style={rewashButtonStyle}>
-                🔁 Re-wash
-              </button>
-            </div>
-          </div>
+            <span style={{ opacity: 0.5 }}>→</span>
+          </button>
         ))}
         {spotCheck.length === 0 && <p style={emptyStyle}>Nothing pending.</p>}
       </section>
@@ -151,8 +160,12 @@ export default function SupervisorPage() {
             <div>
               <div style={{ fontWeight: 600 }}>
                 {r.tower} · Flat {r.flatNumber}
+                {r.priority && <PriorityBadge priority={r.priority} />}
               </div>
-              <div style={{ fontSize: 13, opacity: 0.7 }}>{r.workerName}</div>
+              <div style={{ fontSize: 13, opacity: 0.7 }}>
+                {r.workerName}
+                {r.reason && ` · ${r.reason}`}
+              </div>
             </div>
             <button onClick={() => onClearRewash(r.washRecordId)} style={approveButtonStyle}>
               Cleared
@@ -165,7 +178,43 @@ export default function SupervisorPage() {
   );
 }
 
+function MiniStat({ label, value, of, color }: { label: string; value: number; of: number; color?: string }) {
+  return (
+    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, marginBottom: 4 }}>
+      <span style={{ opacity: 0.7 }}>{label}</span>
+      <span style={{ fontWeight: 600, color: color ?? "#fff" }}>
+        {value} / {of}
+      </span>
+    </div>
+  );
+}
+
+function PriorityBadge({ priority }: { priority: string }) {
+  const colors: Record<string, string> = { high: "#7c2d12", normal: "#3a3a1a", low: "#1a2a1a" };
+  return (
+    <span
+      style={{
+        fontSize: 10,
+        marginLeft: 8,
+        padding: "2px 6px",
+        borderRadius: 999,
+        background: colors[priority] ?? "#333",
+        textTransform: "uppercase",
+      }}
+    >
+      {priority}
+    </span>
+  );
+}
+
 const sectionTitle: React.CSSProperties = { fontSize: 16, opacity: 0.8, marginBottom: 10 };
+const overviewCardStyle: React.CSSProperties = {
+  padding: 14,
+  borderRadius: 10,
+  border: "1px solid #2a2a2c",
+  background: "#1a1a1c",
+  color: "#fff",
+};
 const rowStyle: React.CSSProperties = {
   display: "flex",
   justifyContent: "space-between",
@@ -192,18 +241,19 @@ const selectStyle: React.CSSProperties = {
   color: "#fff",
   border: "1px solid #333",
 };
+const viewRouteButtonStyle: React.CSSProperties = {
+  padding: "8px 12px",
+  borderRadius: 8,
+  border: "1px solid #333",
+  background: "transparent",
+  color: "#fff",
+  fontSize: 13,
+};
 const approveButtonStyle: React.CSSProperties = {
   padding: "8px 14px",
   borderRadius: 8,
   border: "none",
   background: "#22c55e",
   color: "#fff",
-};
-const rewashButtonStyle: React.CSSProperties = {
-  padding: "8px 14px",
-  borderRadius: 8,
-  border: "none",
-  background: "#f59e0b",
-  color: "#000",
 };
 const emptyStyle: React.CSSProperties = { opacity: 0.5, fontSize: 14 };

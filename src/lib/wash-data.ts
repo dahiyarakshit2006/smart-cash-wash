@@ -13,6 +13,8 @@ export interface RouteStopWithVehicle {
   vehicleId: string;
   flatNumber: string;
   registrationNumber: string | null;
+  make: string | null;
+  model: string | null;
   color: string | null;
   washRecordId: string | null;
   washRecordStatus: WashRecordStatus | null;
@@ -22,6 +24,7 @@ export interface TodayRoute {
   routeId: string;
   societyName: string;
   stopsByTower: Record<string, RouteStopWithVehicle[]>;
+  orderedStops: RouteStopWithVehicle[];
   totalStops: number;
   doneCount: number;
 }
@@ -44,7 +47,7 @@ export async function getTodayRoute(workerId: string): Promise<TodayRoute | null
     .from("route_stop")
     .select(
       `id, tower, sequence_no,
-       vehicle:vehicle_id(id, flat_number, registration_number, color),
+       vehicle:vehicle_id(id, flat_number, registration_number, make, model, color),
        wash_record(id, status)`
     )
     .eq("route_id", route.id)
@@ -52,6 +55,7 @@ export async function getTodayRoute(workerId: string): Promise<TodayRoute | null
     .order("sequence_no", { ascending: true });
 
   const stopsByTower: Record<string, RouteStopWithVehicle[]> = {};
+  const orderedStops: RouteStopWithVehicle[] = [];
   let doneCount = 0;
   const totalStops = stops?.length ?? 0;
 
@@ -69,6 +73,8 @@ export async function getTodayRoute(workerId: string): Promise<TodayRoute | null
       vehicleId: vehicle.id,
       flatNumber: vehicle.flat_number,
       registrationNumber: vehicle.registration_number,
+      make: vehicle.make,
+      model: vehicle.model,
       color: vehicle.color,
       washRecordId: latest?.id ?? null,
       washRecordStatus: latest?.status ?? null,
@@ -78,6 +84,7 @@ export async function getTodayRoute(workerId: string): Promise<TodayRoute | null
 
     if (!stopsByTower[s.tower]) stopsByTower[s.tower] = [];
     stopsByTower[s.tower].push(entry);
+    orderedStops.push(entry);
   }
 
   const societyName = Array.isArray(route.society)
@@ -88,9 +95,17 @@ export async function getTodayRoute(workerId: string): Promise<TodayRoute | null
     routeId: route.id,
     societyName: societyName ?? "",
     stopsByTower,
+    orderedStops,
     totalStops,
     doneCount,
   };
+}
+
+// First stop that isn't in a terminal state — this is what the worker sees
+// as "Next car". The route determines it automatically; the worker never
+// searches for or picks their next car.
+export function getNextStop(route: TodayRoute): RouteStopWithVehicle | null {
+  return route.orderedStops.find((s) => !s.washRecordStatus || s.washRecordStatus === "in_progress") ?? null;
 }
 
 // Called when the worker opens a car. Creates the wash_record if this is the
@@ -136,23 +151,39 @@ export interface StopDetail {
   vehicleId: string;
   flatNumber: string;
   tower: string;
+  make: string | null;
+  model: string | null;
+  registrationNumber: string | null;
+  washRecordId: string | null;
+  washRecordStatus: WashRecordStatus | null;
 }
 
 export async function getRouteStopDetail(routeStopId: string): Promise<StopDetail | null> {
   const { data } = await supabase
     .from("route_stop")
-    .select("id, tower, vehicle:vehicle_id(id, flat_number)")
+    .select(
+      `id, tower,
+       vehicle:vehicle_id(id, flat_number, make, model, registration_number),
+       wash_record(id, status)`
+    )
     .eq("id", routeStopId)
     .maybeSingle();
 
   if (!data) return null;
   const vehicle = Array.isArray(data.vehicle) ? data.vehicle[0] : data.vehicle;
+  const washRecords = (data.wash_record ?? []) as { id: string; status: WashRecordStatus }[];
+  const latest = washRecords[washRecords.length - 1];
 
   return {
     routeStopId: data.id,
     vehicleId: (vehicle as { id: string }).id,
     flatNumber: (vehicle as { flat_number: string }).flat_number,
     tower: data.tower,
+    make: (vehicle as { make: string | null }).make,
+    model: (vehicle as { model: string | null }).model,
+    registrationNumber: (vehicle as { registration_number: string | null }).registration_number,
+    washRecordId: latest?.id ?? null,
+    washRecordStatus: latest?.status ?? null,
   };
 }
 
@@ -166,6 +197,100 @@ export async function setPhotoKey(
     .from("wash_record")
     .update({ [column]: key })
     .eq("id", washRecordId);
+}
+
+// ---- Shift ----
+
+export interface ShiftSummary {
+  totalStops: number;
+  completedCount: number;
+  pendingCount: number;
+  issueCount: number;
+  shiftStartAt: string | null;
+  shiftEndAt: string | null;
+}
+
+const ISSUE_STATUSES: WashRecordStatus[] = ["not_in_slot", "declined", "blocked", "already_clean"];
+
+export async function getShiftSummary(workerId: string): Promise<ShiftSummary> {
+  const { data: routes } = await supabase
+    .from("route")
+    .select("id, shift_start_at, shift_end_at, route_stop(id, wash_record(status))")
+    .eq("worker_id", workerId)
+    .eq("route_date", todayDate());
+
+  let totalStops = 0;
+  let completedCount = 0;
+  let issueCount = 0;
+  let shiftStartAt: string | null = null;
+  let shiftEndAt: string | null = null;
+
+  for (const r of routes ?? []) {
+    if (r.shift_start_at) shiftStartAt = r.shift_start_at;
+    if (r.shift_end_at) shiftEndAt = r.shift_end_at;
+    const stops = (r.route_stop ?? []) as { wash_record: { status: WashRecordStatus }[] }[];
+    totalStops += stops.length;
+    for (const s of stops) {
+      const latest = s.wash_record?.[s.wash_record.length - 1];
+      if (!latest) continue;
+      if (latest.status === "done") completedCount++;
+      else if (ISSUE_STATUSES.includes(latest.status)) issueCount++;
+    }
+  }
+
+  return {
+    totalStops,
+    completedCount,
+    pendingCount: totalStops - completedCount - issueCount,
+    issueCount,
+    shiftStartAt,
+    shiftEndAt,
+  };
+}
+
+export async function startShift(workerId: string, geo: { lat: number; lng: number } | null): Promise<void> {
+  const update: Record<string, unknown> = { shift_start_at: new Date().toISOString() };
+  if (geo) {
+    update.shift_start_lat = geo.lat;
+    update.shift_start_lng = geo.lng;
+  }
+  await supabase.from("route").update(update).eq("worker_id", workerId).eq("route_date", todayDate());
+}
+
+export async function endShift(workerId: string, geo: { lat: number; lng: number } | null): Promise<void> {
+  const update: Record<string, unknown> = { shift_end_at: new Date().toISOString() };
+  if (geo) {
+    update.shift_end_lat = geo.lat;
+    update.shift_end_lng = geo.lng;
+  }
+  await supabase.from("route").update(update).eq("worker_id", workerId).eq("route_date", todayDate());
+}
+
+// ---- Profile ----
+
+export interface ProfileStats {
+  carsCompletedThisMonth: number;
+  workingDaysThisMonth: number;
+}
+
+export async function getProfileStats(workerId: string): Promise<ProfileStats> {
+  const monthStart = new Date();
+  monthStart.setDate(1);
+  const monthStartStr = monthStart.toISOString().slice(0, 10);
+
+  const { data: records } = await supabase
+    .from("wash_record")
+    .select("completed_at")
+    .eq("worker_id", workerId)
+    .eq("status", "done")
+    .gte("completed_at", monthStartStr);
+
+  const days = new Set((records ?? []).map((r) => r.completed_at?.slice(0, 10)));
+
+  return {
+    carsCompletedThisMonth: records?.length ?? 0,
+    workingDaysThisMonth: days.size,
+  };
 }
 
 // ---- Supervisor view ----
@@ -219,18 +344,26 @@ export async function getSupervisorOverview(clusterId: string): Promise<WorkerCo
 export interface ReassignTarget {
   workerId: string;
   name: string;
+  currentLoad: number;
 }
 
 export async function getReassignTargets(clusterId: string, excludeWorkerId: string): Promise<ReassignTarget[]> {
   const { data } = await supabase
     .from("worker")
-    .select("id, name")
+    .select("id, name, route(id, route_date, route_stop(id))")
     .eq("cluster_id", clusterId)
     .eq("role", "worker")
     .eq("active", true)
     .neq("id", excludeWorkerId);
 
-  return (data ?? []).map((w) => ({ workerId: w.id, name: w.name }));
+  const today = todayDate();
+  return (data ?? []).map((w) => {
+    const routes = (w.route ?? []) as { route_date: string; route_stop: { id: string }[] }[];
+    const currentLoad = routes
+      .filter((r) => r.route_date === today)
+      .reduce((sum, r) => sum + (r.route_stop?.length ?? 0), 0);
+    return { workerId: w.id, name: w.name, currentLoad };
+  });
 }
 
 export async function reassignRoute(routeId: string, newWorkerId: string): Promise<void> {
@@ -242,16 +375,20 @@ export interface SpotCheckItem {
   workerName: string;
   flatNumber: string;
   tower: string;
+  make: string | null;
+  model: string | null;
   completedAt: string;
+  photoBeforeKey: string | null;
+  photoAfterKey: string | null;
 }
 
 export async function getSpotCheckQueue(clusterId: string): Promise<SpotCheckItem[]> {
   const { data } = await supabase
     .from("wash_record")
     .select(
-      `id, completed_at,
+      `id, completed_at, photo_before_key, photo_after_key,
        worker:worker_id(name, cluster_id),
-       route_stop:route_stop_id(tower, vehicle:vehicle_id(flat_number))`
+       route_stop:route_stop_id(tower, vehicle:vehicle_id(flat_number, make, model))`
     )
     .eq("status", "done")
     .eq("supervisor_signed_off", false)
@@ -271,12 +408,81 @@ export async function getSpotCheckQueue(clusterId: string): Promise<SpotCheckIte
         workerName: (worker as { name: string })?.name ?? "",
         flatNumber: (vehicle as { flat_number: string })?.flat_number ?? "",
         tower: (stop as { tower: string })?.tower ?? "",
+        make: (vehicle as { make: string | null })?.make ?? null,
+        model: (vehicle as { model: string | null })?.model ?? null,
         completedAt: r.completed_at,
+        photoBeforeKey: r.photo_before_key,
+        photoAfterKey: r.photo_after_key,
       };
     });
 }
 
-export async function signOff(washRecordId: string, supervisorId: string, requiresRewash: boolean): Promise<void> {
+// ---- Cluster overview ----
+
+export interface ClusterOverview {
+  workerCount: number;
+  startedCount: number;
+  absentCount: number;
+  carsAssigned: number;
+  carsCompleted: number;
+  carsPending: number;
+  carsIssues: number;
+}
+
+export async function getClusterOverview(clusterId: string): Promise<ClusterOverview> {
+  const overview = await getSupervisorOverview(clusterId);
+
+  const { data: workers } = await supabase
+    .from("worker")
+    .select("id")
+    .eq("cluster_id", clusterId)
+    .eq("role", "worker")
+    .eq("active", true);
+
+  const workerCount = workers?.length ?? 0;
+  const startedCount = overview.filter((w) => w.hasStarted).length;
+
+  const { data: routes } = await supabase
+    .from("route")
+    .select("id, worker:worker_id(cluster_id), route_stop(id, wash_record(status))")
+    .eq("route_date", todayDate())
+    .eq("worker.cluster_id", clusterId);
+
+  let carsAssigned = 0;
+  let carsCompleted = 0;
+  let carsIssues = 0;
+  for (const r of routes ?? []) {
+    const stops = (r.route_stop ?? []) as { wash_record: { status: WashRecordStatus }[] }[];
+    carsAssigned += stops.length;
+    for (const s of stops) {
+      const latest = s.wash_record?.[s.wash_record.length - 1];
+      if (!latest) continue;
+      if (latest.status === "done") carsCompleted++;
+      else if (ISSUE_STATUSES.includes(latest.status)) carsIssues++;
+    }
+  }
+  const carsPending = carsAssigned - carsCompleted - carsIssues;
+
+  return {
+    workerCount,
+    startedCount,
+    absentCount: workerCount - startedCount,
+    carsAssigned,
+    carsCompleted,
+    carsPending,
+    carsIssues,
+  };
+}
+
+export type RewashReason = "not_clean" | "missed_spot" | "customer_complaint" | "other";
+export type RewashPriority = "low" | "normal" | "high";
+
+export async function signOff(
+  washRecordId: string,
+  supervisorId: string,
+  requiresRewash: boolean,
+  rewash?: { reason: RewashReason; priority: RewashPriority }
+): Promise<void> {
   await supabase
     .from("wash_record")
     .update({
@@ -284,8 +490,25 @@ export async function signOff(washRecordId: string, supervisorId: string, requir
       supervisor_id: supervisorId,
       supervisor_signed_off_at: new Date().toISOString(),
       requires_rewash: requiresRewash,
+      rewash_reason: rewash?.reason ?? null,
+      rewash_priority: rewash?.priority ?? null,
     })
     .eq("id", washRecordId);
+}
+
+export async function getPhotoSignedUrls(
+  beforeKey: string | null,
+  afterKey: string | null
+): Promise<{ before: string | null; after: string | null }> {
+  const [before, after] = await Promise.all([
+    beforeKey
+      ? supabase.storage.from("wash-photos").createSignedUrl(beforeKey, 3600).then((r) => r.data?.signedUrl ?? null)
+      : Promise.resolve(null),
+    afterKey
+      ? supabase.storage.from("wash-photos").createSignedUrl(afterKey, 3600).then((r) => r.data?.signedUrl ?? null)
+      : Promise.resolve(null),
+  ]);
+  return { before, after };
 }
 
 export interface RewashItem {
@@ -293,13 +516,16 @@ export interface RewashItem {
   workerName: string;
   flatNumber: string;
   tower: string;
+  reason: string | null;
+  priority: RewashPriority | null;
 }
 
 export async function getRewashQueue(clusterId: string): Promise<RewashItem[]> {
   const { data } = await supabase
     .from("wash_record")
     .select(
-      `id, worker:worker_id(name, cluster_id),
+      `id, rewash_reason, rewash_priority,
+       worker:worker_id(name, cluster_id),
        route_stop:route_stop_id(tower, vehicle:vehicle_id(flat_number))`
     )
     .eq("requires_rewash", true);
@@ -318,7 +544,15 @@ export async function getRewashQueue(clusterId: string): Promise<RewashItem[]> {
         workerName: (worker as { name: string })?.name ?? "",
         flatNumber: (vehicle as { flat_number: string })?.flat_number ?? "",
         tower: (stop as { tower: string })?.tower ?? "",
+        reason: r.rewash_reason as string | null,
+        priority: r.rewash_priority as RewashPriority | null,
       };
+    })
+    .sort((a, b) => {
+      const order: Record<RewashPriority, number> = { high: 0, normal: 1, low: 2 };
+      const ap: RewashPriority = a.priority ?? "normal";
+      const bp: RewashPriority = b.priority ?? "normal";
+      return order[ap] - order[bp];
     });
 }
 

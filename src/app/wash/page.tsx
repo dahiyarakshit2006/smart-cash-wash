@@ -19,7 +19,7 @@ export default function WashRoot() {
         router.replace("/wash/consent");
         return;
       }
-      router.replace(session.role === "supervisor" ? "/wash/supervisor" : "/wash/route");
+      router.replace(session.role === "supervisor" ? "/wash/supervisor" : "/wash/today");
     })();
   }, [router]);
 

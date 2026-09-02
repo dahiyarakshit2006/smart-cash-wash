@@ -19,6 +19,7 @@ export interface WorkerSession {
   role: "worker" | "supervisor";
   languagePref: "hi" | "en";
   clusterId: string;
+  geolocationConsent: boolean;
   issuedAt: string;
 }
 
@@ -44,7 +45,7 @@ export async function verifyOtp(
 
   const { data: worker, error } = await supabase
     .from("worker")
-    .select("id, name, role, language_pref, cluster_id")
+    .select("id, name, role, language_pref, cluster_id, geolocation_consent")
     .eq("phone", phone)
     .maybeSingle();
 
@@ -56,6 +57,7 @@ export async function verifyOtp(
     role: worker.role,
     languagePref: worker.language_pref,
     clusterId: worker.cluster_id,
+    geolocationConsent: worker.geolocation_consent,
     issuedAt: new Date().toISOString(),
   };
 
@@ -97,4 +99,9 @@ export async function acceptConsent(workerId: string, geolocationConsent: boolea
       geolocation_consent: geolocationConsent,
     })
     .eq("id", workerId);
+
+  const session = getSession();
+  if (session && session.workerId === workerId) {
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ ...session, geolocationConsent }));
+  }
 }
