@@ -15,7 +15,11 @@ export default function WashRoot() {
         return;
       }
       const consented = await hasAcceptedConsent(session.workerId);
-      router.replace(consented ? "/wash/route" : "/wash/consent");
+      if (!consented) {
+        router.replace("/wash/consent");
+        return;
+      }
+      router.replace(session.role === "supervisor" ? "/wash/supervisor" : "/wash/route");
     })();
   }, [router]);
 

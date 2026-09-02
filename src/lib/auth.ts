@@ -18,6 +18,7 @@ export interface WorkerSession {
   name: string;
   role: "worker" | "supervisor";
   languagePref: "hi" | "en";
+  clusterId: string;
   issuedAt: string;
 }
 
@@ -43,7 +44,7 @@ export async function verifyOtp(
 
   const { data: worker, error } = await supabase
     .from("worker")
-    .select("id, name, role, language_pref")
+    .select("id, name, role, language_pref, cluster_id")
     .eq("phone", phone)
     .maybeSingle();
 
@@ -54,6 +55,7 @@ export async function verifyOtp(
     name: worker.name,
     role: worker.role,
     languagePref: worker.language_pref,
+    clusterId: worker.cluster_id,
     issuedAt: new Date().toISOString(),
   };
 
