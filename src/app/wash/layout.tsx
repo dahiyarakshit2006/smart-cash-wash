@@ -1,6 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import WashLayoutClient from "./WashLayoutClient";
 
+// All /wash pages are worker-session/live-data screens, never static content —
+// force-dynamic keeps Next from prerendering them at build time (which fails
+// if Supabase env vars aren't present in the build environment).
+export const dynamic = "force-dynamic";
+
 // Scoped to /wash only (manifest "scope" is "/wash") — installing this PWA
 // does not affect or represent the rest of the marketing site.
 export const metadata: Metadata = {
