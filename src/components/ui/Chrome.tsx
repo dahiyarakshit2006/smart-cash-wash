@@ -107,6 +107,12 @@ export function Nav() {
           <a href="#onboard" className="btn-primary !px-5 !py-2.5">
             For societies
           </a>
+          <a
+            href="/wash/login"
+            className="font-mono text-[0.6rem] uppercase tracking-widest2 text-muted/70 transition-colors hover:text-muted"
+          >
+            Washer login
+          </a>
         </nav>
       </div>
     </header>
